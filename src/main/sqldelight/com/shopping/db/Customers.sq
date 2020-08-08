@@ -1,0 +1,29 @@
+
+CREATE TABLE IF NOT EXISTS customers (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  creation_date TEXT NOT NULL
+);
+
+getCustomerById:
+SELECT * FROM customers
+WHERE id == ?;
+
+getCustomerByEmail:
+SELECT * FROM customers
+WHERE email == ?;
+
+createCustomer:
+INSERT INTO customers(name, email, password, creation_date)
+VALUES (?, ?, ?, ?);
+
+updateCustomer:
+UPDATE customers
+SET name = ?, email = ?, password = ?
+WHERE id == ?;
+
+deleteCustomer:
+DELETE FROM customers
+WHERE id == ?;
