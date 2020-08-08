@@ -16,12 +16,12 @@ buildscript {
 
 plugins {
     application
-    kotlin("jvm") version "1.4.0-rc"
+    kotlin("jvm") version "1.3.72"
     id("com.squareup.sqldelight") version "1.4.0"
 }
 
 sqldelight {
-    database("ShoppingDatabase"){
+    database("ShoppingDatabase") {
         packageName = "com.shopping.db"
     }
 }
@@ -51,7 +51,30 @@ dependencies {
     implementation("io.ktor:ktor-jackson:$ktor_version")
     implementation("com.squareup.sqldelight:sqlite-driver:1.4.0")
     implementation("org.koin:koin-ktor:2.1.6")
+
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
+    testImplementation("com.squareup.sqldelight:sqlite-driver:1.4.0")
+    testImplementation("org.koin:koin-test:2.1.6")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.1.3")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:4.1.3")
+    testImplementation("io.kotest:kotest-property-jvm:4.1.3")
+    testImplementation("io.kotest:kotest-runner-console-jvm:4.1.3")
+    testImplementation("io.kotest:kotest-assertions-ktor-jvm:4.1.3")
+    testImplementation("io.kotest:kotest-extensions-koin-jvm:4.1.3")
+}
+
+
+tasks {
+    compileKotlin {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xallow-result-return-type")
+            jvmTarget = "1.8"
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
 }
 
 kotlin.sourceSets["main"].kotlin.srcDirs("src")

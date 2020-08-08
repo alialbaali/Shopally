@@ -1,7 +1,9 @@
 package com.shopping.app
 
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.shopping.di.dataSourceModule
 import com.shopping.di.dbModule
+import com.shopping.di.repositoryModule
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -38,7 +40,7 @@ fun Application.module(testing: Boolean = false) {
     }
 
     install(Koin) {
-        modules(dbModule)
+        modules(dbModule, dataSourceModule, repositoryModule)
     }
 
     routing {
