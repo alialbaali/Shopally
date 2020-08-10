@@ -1,4 +1,4 @@
-package com.shopping.data.repository
+package com.shopping.domain.repository
 
 import com.shopping.domain.Customer
 

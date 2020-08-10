@@ -1,7 +1,8 @@
-package com.shopping.data.repository
+package com.shopping.repository
 
 import com.shopping.db.CustomersQueries
 import com.shopping.domain.Customer
+import com.shopping.domain.repository.CustomerRepository
 
 private const val ERROR_NOT_EXIST = "Customer doesn't exist"
 private const val ERROR_EXIST = "Customer exists"
