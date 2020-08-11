@@ -1,10 +1,18 @@
+import com.shopping.domain.model.inline.Email;
+import com.shopping.domain.model.inline.Id;
+import com.shopping.domain.model.inline.Image;
+import com.shopping.domain.model.inline.Name;
+import com.shopping.domain.model.inline.Password;
+import java.time.LocalDate;
+
 
 CREATE TABLE IF NOT EXISTS customers (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE,
-  password TEXT NOT NULL,
-  creation_date TEXT NOT NULL
+  id TEXT AS Id NOT NULL PRIMARY KEY,
+  name TEXT AS Name NOT NULL,
+  email TEXT AS Email NOT NULL UNIQUE,
+  password TEXT AS Password NOT NULL,
+  image TEXT AS Image NOT NULL,
+  creation_date TEXT AS LocalDate NOT NULL
 );
 
 getCustomerById:
@@ -16,12 +24,12 @@ SELECT * FROM customers
 WHERE email == ?;
 
 createCustomer:
-INSERT INTO customers(name, email, password, creation_date)
-VALUES (?, ?, ?, ?);
+INSERT INTO customers(id, name, email, password, image, creation_date)
+VALUES (?, ?, ?, ?, ?, ?);
 
 updateCustomer:
 UPDATE customers
-SET name = ?, email = ?, password = ?
+SET name = ?, email = ?, password = ?, image = ?
 WHERE id == ?;
 
 deleteCustomer:
