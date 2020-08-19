@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import com.shopping.domain.model.inline.Id
+import com.shopping.domain.model.valueObject.ID
 import com.shopping.toDate
 import java.time.LocalDateTime
 import java.util.*
@@ -13,11 +13,11 @@ class JWTHelper {
 
     companion object {
 
-        private val SECRET = System.getenv("JWT_SECRET")
+        private val SECRET = System.getenv("JWT_SECRET") ?: "SECRET"
 
-        val ISSUER: String = System.getenv("JWT_ISSUER")
+        val ISSUER: String = System.getenv("JWT_ISSUER") ?: "ISSUER"
 
-        val AUDIENCE: String = System.getenv("JWT_AUDIENCE")
+        val AUDIENCE: String = System.getenv("JWT_AUDIENCE") ?: "AUDIENCE"
 
         val ALGORITHM: Algorithm = Algorithm.HMAC256(SECRET)
 
@@ -29,7 +29,7 @@ class JWTHelper {
     }
 
     fun generateToken(
-        id: Id,
+        id: ID,
         issuedAt: LocalDateTime? = LocalDateTime.now(),
         expiresAt: LocalDateTime? = LocalDateTime.now().plusDays(7),
         notBefore: LocalDateTime? = null,

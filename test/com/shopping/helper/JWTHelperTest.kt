@@ -17,7 +17,7 @@ class JWTHelperTest : BehaviorSpec(), KoinTest {
 
     private val jwtHelper by inject<JWTHelper>()
 
-    override fun listeners(): List<TestListener> = super.listeners().plus(KoinTestListener(helperModule))
+    override fun listeners(): List<TestListener> = listOf(KoinTestListener(helperModule))
 
     init {
 

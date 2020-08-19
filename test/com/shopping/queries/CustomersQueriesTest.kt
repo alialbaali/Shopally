@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 class CustomersQueriesTest : BehaviorSpec(), KoinTest {
 
-    override fun listeners(): List<TestListener> = super.listeners().plus(KoinTestListener(dbModule, dataSourceModule))
+    override fun listeners(): List<TestListener> = listOf(KoinTestListener(dbModule, dataSourceModule))
 
     private val customersQueries by inject<CustomersQueries>()
 

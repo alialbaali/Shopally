@@ -17,7 +17,7 @@ import org.koin.test.inject
 
 class AddressesQueriesTest : BehaviorSpec(), KoinTest {
 
-    override fun listeners(): List<TestListener> = super.listeners().plus(KoinTestListener(dbModule, dataSourceModule))
+    override fun listeners(): List<TestListener> = listOf(KoinTestListener(dbModule, dataSourceModule))
 
     private val addressesQueries by inject<AddressesQueries>()
 
