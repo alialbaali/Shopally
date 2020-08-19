@@ -1,8 +1,8 @@
-package com.shopping.domain.model.inline
+package com.shopping.domain.model.valueObject
 
 import com.shopping.Errors
 
-inline class Email(val value: String) {
+inline class Email(private val value: String) {
 
     companion object {
 
@@ -22,5 +22,7 @@ inline class Email(val value: String) {
                 Result.failure(Throwable(Errors.INVALID_EMAIL))
 
     }
+
+    override fun toString(): String = value
 
 }

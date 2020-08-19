@@ -1,19 +1,19 @@
-package com.shopping.domain.model.inline
+package com.shopping.domain.model.valueObject
 
 import com.shopping.AuthenticationError
 import com.shopping.Errors
 import java.util.*
 
-inline class Id(val value: String) {
+inline class ID(private val value: String) {
 
     companion object {
 
-        fun generate() = Id(UUID.randomUUID().toString())
+        fun random() = ID(UUID.randomUUID().toString())
 
-        fun create(id: String): Result<Id> =
+        fun from(id: String): Result<ID> =
             try {
                 val uuid = UUID.fromString(id)
-                Result.success(Id(uuid.toString()))
+                Result.success(ID(uuid.toString()))
             } catch (e: Throwable) {
                 Result.failure(Throwable(Errors.INVALID_ID))
             }
@@ -24,6 +24,6 @@ inline class Id(val value: String) {
 
 }
 
-fun String.validateId() = Id.create(this).getOrElse {
+fun String.asID() = ID.from(this).getOrElse {
     throw AuthenticationError(Errors.INVALID_ID)
 }

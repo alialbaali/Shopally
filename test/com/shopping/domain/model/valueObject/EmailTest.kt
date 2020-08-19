@@ -1,4 +1,4 @@
-package com.shopping.domain.model.inline
+package com.shopping.domain.model.valueObject
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.nulls.shouldBeNull
@@ -16,7 +16,7 @@ class EmailTest : BehaviorSpec() {
                     val result = Email.create("johndoe@mail.com").getOrNull()
 
                     result.shouldNotBeNull()
-                    result.value shouldBe "johndoe@mail.com"
+                    result.toString() shouldBe "johndoe@mail.com"
 
                 }
             }

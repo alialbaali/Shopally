@@ -1,8 +1,8 @@
-package com.shopping.domain.model.inline
+package com.shopping.domain.model.valueObject
 
 import com.shopping.Errors
 
-inline class Password(val value: String) {
+inline class Password(private val value: String) {
 
     companion object {
 
@@ -18,6 +18,6 @@ inline class Password(val value: String) {
 
     }
 
-    override fun toString(): String = String()
+    override fun toString(): String = value
 
 }

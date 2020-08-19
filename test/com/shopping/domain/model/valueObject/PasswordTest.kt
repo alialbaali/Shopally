@@ -1,4 +1,4 @@
-package com.shopping.domain.model.inline
+package com.shopping.domain.model.valueObject
 
 import com.shopping.hash
 import io.kotest.core.spec.style.BehaviorSpec
@@ -21,7 +21,7 @@ class PasswordTest : BehaviorSpec() {
                     val hashedPassword = inlinedPassword.getOrNull()
 
                     hashedPassword.shouldNotBeNull()
-                    hashedPassword.value shouldNotBeEqualComparingTo password
+                    hashedPassword.toString() shouldNotBeEqualComparingTo password
 
                 }
             }
@@ -55,7 +55,7 @@ class PasswordTest : BehaviorSpec() {
                     val hashedPassword = inlinedPassword.getOrNull()
 
                     hashedPassword.shouldNotBeNull()
-                    hashedPassword.value shouldNotBeEqualComparingTo password
+                    hashedPassword.toString() shouldNotBeEqualComparingTo password
 
                 }
             }
