@@ -1,37 +1,34 @@
-import com.shopping.domain.model.inline.Email;
-import com.shopping.domain.model.inline.Id;
-import com.shopping.domain.model.inline.Image;
-import com.shopping.domain.model.inline.Name;
-import com.shopping.domain.model.inline.Password;
+import com.shopping.domain.model.valueObject.Email;
+import com.shopping.domain.model.valueObject.ID;
+import com.shopping.domain.model.valueObject.Password;
 import java.time.LocalDate;
 
-
-CREATE TABLE IF NOT EXISTS customers (
-  id TEXT AS Id NOT NULL PRIMARY KEY,
-  name TEXT AS Name NOT NULL,
+CREATE TABLE IF NOT EXISTS Customers (
+  id TEXT AS ID NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
   email TEXT AS Email NOT NULL UNIQUE,
   password TEXT AS Password NOT NULL,
-  image TEXT AS Image NOT NULL,
+  image TEXT NOT NULL,
   creation_date TEXT AS LocalDate NOT NULL
 );
 
 getCustomerById:
-SELECT * FROM customers
+SELECT * FROM Customers
 WHERE id == ?;
 
 getCustomerByEmail:
-SELECT * FROM customers
+SELECT * FROM Customers
 WHERE email == ?;
 
 createCustomer:
-INSERT INTO customers(id, name, email, password, image, creation_date)
+INSERT INTO Customers(id, name, email, password, image, creation_date)
 VALUES (?, ?, ?, ?, ?, ?);
 
 updateCustomer:
-UPDATE customers
+UPDATE Customers
 SET name = ?, email = ?, password = ?, image = ?
 WHERE id == ?;
 
 deleteCustomer:
-DELETE FROM customers
+DELETE FROM Customers
 WHERE id == ?;
