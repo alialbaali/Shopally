@@ -1,15 +1,14 @@
 package com.shopping.helper
 
+import com.shopping.KoinTestListener
 import com.shopping.di.helperModule
-import com.shopping.domain.model.inline.Id
+import com.shopping.domain.model.valueObject.ID
 import com.shopping.toLocalDateTime
-import io.kotest.core.spec.Spec
+import io.kotest.core.listeners.TestListener
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import java.time.LocalDateTime
@@ -18,15 +17,7 @@ class JWTHelperTest : BehaviorSpec(), KoinTest {
 
     private val jwtHelper by inject<JWTHelper>()
 
-    override fun beforeSpec(spec: Spec) {
-        super.beforeSpec(spec)
-        startKoin { modules(helperModule) }
-    }
-
-    override fun afterSpec(spec: Spec) {
-        super.afterSpec(spec)
-        stopKoin()
-    }
+    override fun listeners(): List<TestListener> = super.listeners().plus(KoinTestListener(helperModule))
 
     init {
 
@@ -34,7 +25,7 @@ class JWTHelperTest : BehaviorSpec(), KoinTest {
             When("calling jwt helper generate token method") {
                 Then("it should return a valid jwt token with a subject matching the id") {
 
-                    val id = Id.generate()
+                    val id = ID.random()
 
                     val token = jwtHelper.generateToken(id)
 
@@ -53,7 +44,7 @@ class JWTHelperTest : BehaviorSpec(), KoinTest {
             When("calling jwt helper generate token method") {
                 Then("it should return a valid jwt token with dates matching the provided ones") {
 
-                    val id = Id.generate()
+                    val id = ID.random()
                     val issuedAt = LocalDateTime.now().minusHours(1)
                     val expiresAt = LocalDateTime.now().plusDays(1)
                     val notBefore = LocalDateTime.now()
@@ -84,9 +75,13 @@ class JWTHelperTest : BehaviorSpec(), KoinTest {
                 When("calling jwt helper generate token method") {
                     Then("it should return a valid jwt token with the claims provided") {
 
-                        val id = Id.generate()
-                        val claims =
-                            mapOf("claim1" to 1, "claim2" to "two", "claim3" to true, "claim4" to LocalDateTime.now())
+                        val id = ID.random()
+                        val claims = mapOf(
+                            "claim1" to 1,
+                            "claim2" to "two",
+                            "claim3" to true,
+                            "claim4" to LocalDateTime.now()
+                        )
 
                         val token = jwtHelper.generateToken(id, claims = claims)
 
