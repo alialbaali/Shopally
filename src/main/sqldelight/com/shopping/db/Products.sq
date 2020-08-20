@@ -1,0 +1,34 @@
+import com.shopping.domain.model.Product.Category;
+import com.shopping.domain.model.valueObject.ID;
+import java.time.LocalDate;
+
+CREATE TABLE Products (
+id              TEXT    AS ID          NOT NULL    PRIMARY KEY,
+category        TEXT AS Category    NOT NULL,
+brand           TEXT           NOT NULL,
+name            TEXT           NOT NULL,
+description     TEXT           NOT NULL,
+price           REAL    NOT NULL,
+release_date    TEXT    AS LocalDate   NOT NULL,
+creation_date   TEXT    AS LocalDate   NOT NULL
+);
+
+getProducts:
+SELECT * FROM Products;
+
+getProductById:
+SELECT * FROM Products
+WHERE id == ?;
+
+createProduct:
+INSERT INTO Products (id, category, brand, name, description, price, release_date, creation_date)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+updateProduct:
+UPDATE Products
+SET category = ?, brand = ?, name = ?, description = ?, price = ?, release_date = ?
+WHERE id == ?;
+
+deleteProduct:
+DELETE FROM Products
+WHERE id == ?;

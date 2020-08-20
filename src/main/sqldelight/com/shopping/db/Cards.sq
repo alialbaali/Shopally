@@ -1,3 +1,4 @@
+import com.shopping.domain.model.valueObject.Balance;
 import com.shopping.domain.model.valueObject.ID;
 import java.time.LocalDate;
 
@@ -6,7 +7,7 @@ customer_id TEXT AS ID REFERENCES Customers(id) NOT NULL,
 name TEXT NOT NULL,
 brand TEXT NOT NULL,
 number INTEGER NOT NULL,
-balance REAL NOT NULL,
+balance REAL AS Balance NOT NULL,
 ccv INTEGER NOT NULL,
 expiration_date TEXT AS LocalDate NOT NULL
 );

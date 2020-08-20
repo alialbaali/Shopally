@@ -1,0 +1,37 @@
+import com.shopping.domain.model.valueObject.Balance;
+import com.shopping.domain.model.valueObject.ID;
+import java.time.LocalDate;
+
+CREATE TABLE Orders (
+id TEXT AS ID NOT NULL PRIMARY KEY,
+customer_id TEXT AS ID REFERENCES Customers(id) NOT NULL,
+
+address_name TEXT NOT NULL,
+address_country TEXT NOT NULL,
+address_city TEXT NOT NULL,
+address_line TEXT NOT NULL,
+address_zip_code TEXT NOT NULL,
+
+card_name TEXT NOT NULL,
+card_brand TEXT NOT NULL,
+card_number INTEGER NOT NULL,
+card_balance REAL AS Balance NOT NULL,
+card_ccv INTEGER NOT NULL,
+card_expiration_date TEXT AS LocalDate NOT NULL,
+
+creation_date TEXT AS LocalDate NOT NULL
+);
+
+
+getOrderById:
+SELECT * FROM Orders
+WHERE id == ?;
+
+getOrdersByCustomerId:
+SELECT * FROM Orders
+WHERE customer_id == ?;
+
+createOrder:
+INSERT INTO Orders (id, customer_id, address_name, address_country, address_city, address_line, address_zip_code,
+card_name, card_brand, card_number, card_balance, card_ccv, card_expiration_date, creation_date)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

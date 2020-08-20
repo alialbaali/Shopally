@@ -1,6 +1,7 @@
 package main.sqldelight.com.shopping.db
 
 import com.shopping.domain.model.Product
+import com.shopping.domain.model.valueObject.Balance
 import com.shopping.domain.model.valueObject.Email
 import com.shopping.domain.model.valueObject.ID
 import com.shopping.domain.model.valueObject.Password
@@ -46,5 +47,13 @@ object CategoryColumnAdapter : ColumnAdapter<Product.Category, String> {
     override fun decode(databaseValue: String): Product.Category = Product.Category.valueOf(databaseValue)
 
     override fun encode(value: Product.Category): String = value.name
+
+}
+
+object BalanceColumnAdapter: ColumnAdapter<Balance, Double> {
+
+    override fun encode(value: Balance): Double = value.value
+
+    override fun decode(databaseValue: Double): Balance = Balance(databaseValue)
 
 }
