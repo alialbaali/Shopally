@@ -3,7 +3,6 @@ package com.shopping.domain.service
 import com.shopping.domain.dto.SignInRequest
 import com.shopping.domain.dto.SignUpRequest
 import com.shopping.domain.dto.TokenResponse
-import com.shopping.domain.model.inline.Id
 
 interface AuthService {
 

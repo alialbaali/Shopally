@@ -2,19 +2,20 @@ package com.shopping.service
 
 import com.shopping.APIError
 import com.shopping.AuthenticationError
-import com.shopping.di.*
+import com.shopping.KoinTestListener
+import com.shopping.di.helperModule
+import com.shopping.di.serviceModule
 import com.shopping.domain.dto.SignInRequest
 import com.shopping.domain.dto.SignUpRequest
-import com.shopping.domain.model.inline.Id
+import com.shopping.domain.model.valueObject.ID
 import com.shopping.domain.service.AuthService
+import com.shopping.FakeRepositoryModule
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
-import io.kotest.core.spec.Spec
+import io.kotest.core.listeners.TestListener
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.string.shouldNotBeEmpty
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
@@ -22,15 +23,7 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
 
     private val authService by inject<AuthService>()
 
-    override fun beforeSpec(spec: Spec) {
-        super.beforeSpec(spec)
-        startKoin { modules(dbModule, dataSourceModule, repositoryModule, serviceModule, helperModule) }
-    }
-
-    override fun afterSpec(spec: Spec) {
-        super.afterSpec(spec)
-        stopKoin()
-    }
+    override fun listeners(): List<TestListener> = listOf(KoinTestListener(serviceModule, helperModule, FakeRepositoryModule))
 
     init {
 
@@ -157,7 +150,7 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
             When("calling auth service refresh token method") {
                 Then("it should return a Token Response with access and refresh tokens") {
 
-                    val id = Id.generate().toString()
+                    val id = ID.random().toString()
 
                     val tokenResponse = authService.refreshToken(id)
 

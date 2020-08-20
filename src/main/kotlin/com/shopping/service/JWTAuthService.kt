@@ -6,8 +6,8 @@ import com.shopping.domain.dto.SignInRequest
 import com.shopping.domain.dto.SignUpRequest
 import com.shopping.domain.dto.TokenResponse
 import com.shopping.domain.model.Customer
-import com.shopping.domain.model.inline.Id
-import com.shopping.domain.model.inline.validateId
+import com.shopping.domain.model.valueObject.ID
+import com.shopping.domain.model.valueObject.asID
 import com.shopping.domain.repository.CustomerRepository
 import com.shopping.domain.service.AuthService
 import com.shopping.helper.JWTHelper
@@ -46,9 +46,9 @@ class JWTAuthService(private val customerRepository: CustomerRepository) : AuthS
 
     }
 
-    override suspend fun refreshToken(customerId: String): TokenResponse = createTokenResponse(customerId.validateId())
+    override suspend fun refreshToken(customerId: String): TokenResponse = createTokenResponse(customerId.asID())
 
-    private fun createTokenResponse(id: Id): TokenResponse {
+    private fun createTokenResponse(id: ID): TokenResponse {
 
         val jwtHelper by inject<JWTHelper>()
 
