@@ -1,26 +1,21 @@
 package com.shopping.queries
 
-import com.shopping.KoinTestListener
+import com.shopping.DefaultSpec
+import com.shopping.dataSourceModule
 import com.shopping.db.CustomersQueries
-import com.shopping.di.dataSourceModule
-import com.shopping.di.dbModule
-import com.shopping.domain.model.Customer
+import com.shopping.dbModule
 import com.shopping.domain.model.valueObject.Email
 import com.shopping.domain.model.valueObject.ID
 import com.shopping.domain.model.valueObject.Password
 import com.shopping.hash
-import io.kotest.core.listeners.TestListener
-import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import org.koin.test.KoinTest
+import org.koin.experimental.property.inject
 import org.koin.test.inject
 import java.time.LocalDate
 
-class CustomersQueriesTest : BehaviorSpec(), KoinTest {
-
-    override fun listeners(): List<TestListener> = listOf(KoinTestListener(dbModule, dataSourceModule))
+class CustomersQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
 
     private val customersQueries by inject<CustomersQueries>()
 
@@ -41,7 +36,7 @@ class CustomersQueriesTest : BehaviorSpec(), KoinTest {
                         name,
                         email,
                         password,
-                        image = String(),
+                        image_url = String(),
                         creation_date = LocalDate.now(),
                     )
 
@@ -71,7 +66,7 @@ class CustomersQueriesTest : BehaviorSpec(), KoinTest {
                             name,
                             email,
                             password,
-                            image = String(),
+                            image_url = String(),
                             creation_date = LocalDate.now(),
                         )
 
@@ -83,13 +78,11 @@ class CustomersQueriesTest : BehaviorSpec(), KoinTest {
                         val updatedEmail = Email.create("johndoe2@mail.com").getOrThrow()
                         val updatedPassword = Password.create("password02") { hash() }.getOrThrow()
 
-                        customersQueries.updateCustomer(
-                            updatedName,
-                            updatedEmail,
-                            updatedPassword,
-                            image = String(),
-                            id = customerId,
-                        )
+                        customersQueries.updateCustomerNameByid(updatedName, customerId)
+
+                        customersQueries.updateCustomerEmailById(updatedEmail, customerId)
+
+                        customersQueries.updateCustomerPasswordById(updatedPassword, customerId)
 
                         val dbUpdatedCustomer = customersQueries.getCustomerById(customerId).executeAsOneOrNull()
 
@@ -118,7 +111,7 @@ class CustomersQueriesTest : BehaviorSpec(), KoinTest {
                         name,
                         email,
                         password,
-                        image = String(),
+                        image_url = String(),
                         creation_date = LocalDate.now(),
                     )
 
@@ -126,7 +119,7 @@ class CustomersQueriesTest : BehaviorSpec(), KoinTest {
 
                     dbCustomer.shouldNotBeNull()
 
-                    customersQueries.deleteCustomer(customerId)
+                    customersQueries.deleteCustomerById(customerId)
 
                     val dbCustomerAfterDeletion = customersQueries.getCustomerById(customerId).executeAsOneOrNull()
 

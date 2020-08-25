@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS Customers (
   name TEXT NOT NULL,
   email TEXT AS Email NOT NULL UNIQUE,
   password TEXT AS Password NOT NULL,
-  image TEXT NOT NULL,
+  image_url TEXT NOT NULL,
   creation_date TEXT AS LocalDate NOT NULL
 );
 
@@ -21,14 +21,29 @@ SELECT * FROM Customers
 WHERE email == ?;
 
 createCustomer:
-INSERT INTO Customers(id, name, email, password, image, creation_date)
+INSERT INTO Customers(id, name, email, password, image_url, creation_date)
 VALUES (?, ?, ?, ?, ?, ?);
 
-updateCustomer:
+updateCustomerEmailById:
 UPDATE Customers
-SET name = ?, email = ?, password = ?, image = ?
+SET email = ?
 WHERE id == ?;
 
-deleteCustomer:
+updateCustomerNameByid:
+UPDATE Customers
+SET name = ?
+WHERE id == ?;
+
+updateCustomerPasswordById:
+UPDATE Customers
+SET password = ?
+WHERE id == ?;
+
+updateCustomerImageById:
+UPDATE Customers
+SET image_url = ?
+WHERE id == ?;
+
+deleteCustomerById:
 DELETE FROM Customers
 WHERE id == ?;
