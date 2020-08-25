@@ -1,8 +1,8 @@
 package com.shopping.domain.dto
 
 import com.shopping.AuthenticationError
-import com.shopping.domain.model.inline.Email
-import com.shopping.domain.model.inline.Password
+import com.shopping.domain.model.valueObject.Email
+import com.shopping.domain.model.valueObject.Password
 import com.shopping.hash
 
 class SignInRequest(

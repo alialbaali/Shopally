@@ -2,9 +2,8 @@ package com.shopping.domain.dto
 
 import com.shopping.AuthenticationError
 import com.shopping.Errors
-import com.shopping.domain.model.inline.Email
-import com.shopping.domain.model.inline.Name
-import com.shopping.domain.model.inline.Password
+import com.shopping.domain.model.valueObject.Email
+import com.shopping.domain.model.valueObject.Password
 import com.shopping.hash
 
 class SignUpRequest(
@@ -13,9 +12,7 @@ class SignUpRequest(
     val password: String
 ) {
 
-    operator fun component1(): Name = Name.create(name).getOrElse {
-        throw AuthenticationError(it.message)
-    }
+    operator fun component1(): String = if (name.isBlank()) throw AuthenticationError(Errors.INVALID_NAME) else name
 
     operator fun component2(): Email = Email.create(email).getOrElse {
         throw AuthenticationError(it.message)
