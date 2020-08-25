@@ -11,7 +11,7 @@ class KoinTestListener(private vararg val modules: Module) : TestListener {
 
     override suspend fun beforeEach(testCase: TestCase) {
         super.beforeEach(testCase)
-        startKoin { modules(modules.toList()) }
+        startKoin { modules(*modules) }
     }
 
     override suspend fun afterEach(testCase: TestCase, result: TestResult) {
