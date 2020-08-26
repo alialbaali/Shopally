@@ -36,6 +36,7 @@ application {
 
 repositories {
     mavenLocal()
+    mavenCentral()
     jcenter()
     maven { url = uri("https://kotlin.bintray.com/ktor") }
     google()
@@ -52,6 +53,7 @@ dependencies {
     implementation("io.ktor:ktor-locations:$ktor_version")
     implementation("com.squareup.sqldelight:sqlite-driver:1.4.0")
     implementation("org.koin:koin-ktor:2.1.6")
+    implementation("com.cloudinary:cloudinary-http44:1.26.0")
 //    implementation("com.stripe:stripe-java:19.40.0")
 
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
@@ -63,7 +65,6 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core-jvm:$kotest_version")
     testImplementation("io.kotest:kotest-property-jvm:$kotest_version")
     testImplementation("io.kotest:kotest-assertions-ktor-jvm:$kotest_version")
-    testImplementation("io.kotest:kotest-extensions-koin-jvm:$kotest_version")
 
 }
 
