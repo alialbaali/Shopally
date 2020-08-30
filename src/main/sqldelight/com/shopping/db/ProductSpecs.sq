@@ -1,0 +1,29 @@
+import com.shopping.domain.model.valueObject.ID;
+
+CREATE TABLE IF NOT EXISTS ProductSpecs (
+product_id TEXT AS ID REFERENCES Products(id) NOT NULL,
+key TEXT NOT NULL,
+value TEXT NOT NULL,
+UNIQUE(product_id, key, value)
+);
+
+getSpecsByProductId:
+SELECT * FROM ProductSpecs
+WHERE product_id == ?;
+
+createSpec:
+INSERT INTO ProductSpecs (product_id, key, value)
+VALUES (?, ?, ?);
+
+updateSpecByKey:
+UPDATE ProductSpecs
+SET value = ?
+WHERE product_id == ? AND key == ?;
+
+deleteSpecByKey:
+DELETE FROM ProductSpecs
+WHERE product_id == ? AND key == ?;
+
+deleteSpecsByProductId:
+DELETE FROM ProductSpecs
+WHERE product_id == ?;
