@@ -1,25 +1,20 @@
 package com.shopping.queries
 
-import com.shopping.KoinTestListener
-import com.shopping.db.AddressesQueries
-import com.shopping.di.dataSourceModule
-import com.shopping.di.dbModule
+import com.shopping.DefaultSpec
+import com.shopping.dataSourceModule
+import com.shopping.db.CustomerAddressesQueries
+import com.shopping.dbModule
 import com.shopping.domain.model.valueObject.ID
-import io.kotest.core.listeners.TestListener
-import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.longs.shouldBeExactly
 import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import org.koin.test.KoinTest
 import org.koin.test.inject
 
-class AddressesQueriesTest : BehaviorSpec(), KoinTest {
+class AddressesQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
 
-    override fun listeners(): List<TestListener> = listOf(KoinTestListener(dbModule, dataSourceModule))
-
-    private val addressesQueries by inject<AddressesQueries>()
+    private val customerAddressesQueries by inject<CustomerAddressesQueries>()
 
     init {
 
@@ -35,7 +30,7 @@ class AddressesQueriesTest : BehaviorSpec(), KoinTest {
                         val line = "Line"
                         val zipCode = "5438"
 
-                        addressesQueries.createAddress(
+                        customerAddressesQueries.createAddress(
                             customerId,
                             name,
                             country,
@@ -44,9 +39,9 @@ class AddressesQueriesTest : BehaviorSpec(), KoinTest {
                             zipCode
                         )
 
+                        val addresses = customerAddressesQueries.getAddressesByCustomerID(customerId).executeAsList()
 
-                        val addresses = addressesQueries.getAddressesByCustomerID(customerId).executeAsList()
-                        val addressesCount = addressesQueries.countAddressesByCustomerId(customerId).executeAsOne()
+                        val addressesCount = customerAddressesQueries.countAddressesByCustomerId(customerId).executeAsOne()
 
                         addresses.shouldNotBeEmpty()
                         addressesCount shouldBe 1
@@ -70,7 +65,7 @@ class AddressesQueriesTest : BehaviorSpec(), KoinTest {
                         val line = "Line $it"
                         val zipCode = "5438 $it"
 
-                        addressesQueries.createAddress(
+                        customerAddressesQueries.createAddress(
                             customerId,
                             name,
                             country,
@@ -81,13 +76,14 @@ class AddressesQueriesTest : BehaviorSpec(), KoinTest {
 
                     }
 
-                    val addressesCount = addressesQueries.countAddressesByCustomerId(customerId).executeAsOne()
+                    val addressesCount = customerAddressesQueries.countAddressesByCustomerId(customerId).executeAsOne()
 
                     addressesCount shouldBeGreaterThanOrEqual 5
 
-                    addressesQueries.deleteAddressesByCustomerID(customerId)
+                    customerAddressesQueries.deleteAddressesByCustomerID(customerId)
 
-                    val addressesCountAfterDeletion = addressesQueries.countAddressesByCustomerId(customerId).executeAsOne()
+                    val addressesCountAfterDeletion =
+                        customerAddressesQueries.countAddressesByCustomerId(customerId).executeAsOne()
 
                     addressesCountAfterDeletion shouldBeExactly 0
 

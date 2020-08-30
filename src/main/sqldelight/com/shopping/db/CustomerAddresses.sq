@@ -1,26 +1,26 @@
 import com.shopping.domain.model.valueObject.ID;
 
-CREATE TABLE Addresses (
+CREATE TABLE IF NOT EXISTS CustomerAddresses (
 customer_id TEXT AS ID NOT NULL REFERENCES Customers(id),
 name TEXT NOT NULL,
 country TEXT NOT NULL,
 city TEXT NOT NULL,
-address_line TEXT NOT NULL,
+line TEXT NOT NULL,
 zip_code TEXT NOT NULL
 );
 
 getAddressesByCustomerID:
-SELECT * FROM Addresses
+SELECT * FROM CustomerAddresses
 WHERE customer_id == ?;
 
 countAddressesByCustomerId:
-SELECT COUNT(*) FROM Addresses
+SELECT COUNT(*) FROM CustomerAddresses
 WHERE customer_id == ?;
 
 createAddress:
-INSERT INTO Addresses (customer_id, name, country, city, address_line, zip_code)
+INSERT INTO CustomerAddresses (customer_id, name, country, city, line, zip_code)
 VALUES (?, ?, ?, ?, ?, ?);
 
 deleteAddressesByCustomerID:
-DELETE FROM Addresses
+DELETE FROM CustomerAddresses
 WHERE customer_id == ?;
