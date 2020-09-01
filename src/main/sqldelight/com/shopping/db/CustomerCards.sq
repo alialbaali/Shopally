@@ -1,0 +1,27 @@
+import com.shopping.domain.model.valueObject.ID;
+
+CREATE TABLE IF NOT EXISTS CustomerCards (
+customer_id TEXT AS ID REFERENCES Customers(id) NOT NULL,
+stripe_card_id TEXT NOT NULL,
+UNIQUE(customer_id, stripe_card_id)
+);
+
+countCardsByCustomerId:
+SELECT COUNT(stripe_card_id) FROM CustomerCards
+WHERE customer_id == ?;
+
+getCardsByCustomerId:
+SELECT * FROM CustomerCards
+WHERE customer_id == ?;
+
+createCard:
+INSERT INTO CustomerCards (customer_id, stripe_card_id)
+VALUES (?, ?);
+
+deleteCardsByCustomerId:
+DELETE FROM CustomerCards
+WHERE customer_id == ?;
+
+deleteCard:
+DELETE FROM CustomerCards
+WHERE customer_id == ? AND stripe_card_id == ?;

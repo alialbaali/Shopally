@@ -7,6 +7,6 @@ import org.koin.test.KoinTest
 
 abstract class DefaultSpec(private vararg val modules: Module = emptyArray()) : BehaviorSpec(), KoinTest {
 
-    override fun listeners(): List<TestListener> = listOf(KoinTestListener(*modules))
+    override fun listeners(): List<TestListener> = if (modules.isNotEmpty()) listOf(KoinTestListener(*modules)) else emptyList()
 
 }
