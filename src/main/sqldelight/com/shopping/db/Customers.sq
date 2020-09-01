@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 CREATE TABLE IF NOT EXISTS Customers (
   id TEXT AS ID NOT NULL PRIMARY KEY,
+  stripe_id TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
   email TEXT AS Email NOT NULL UNIQUE,
   password TEXT AS Password NOT NULL,
@@ -21,27 +22,12 @@ SELECT * FROM Customers
 WHERE email == ?;
 
 createCustomer:
-INSERT INTO Customers(id, name, email, password, image_url, creation_date)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT INTO Customers(id, stripe_id, name, email, password, image_url, creation_date)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
-updateCustomerEmailById:
+updateCustomerById:
 UPDATE Customers
-SET email = ?
-WHERE id == ?;
-
-updateCustomerNameByid:
-UPDATE Customers
-SET name = ?
-WHERE id == ?;
-
-updateCustomerPasswordById:
-UPDATE Customers
-SET password = ?
-WHERE id == ?;
-
-updateCustomerImageById:
-UPDATE Customers
-SET image_url = ?
+SET name = ?, email = ?, password = ?, image_url = ?
 WHERE id == ?;
 
 deleteCustomerById:

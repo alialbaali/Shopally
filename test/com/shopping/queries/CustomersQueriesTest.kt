@@ -11,7 +11,6 @@ import com.shopping.hash
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import org.koin.experimental.property.inject
 import org.koin.test.inject
 import java.time.LocalDate
 
@@ -26,6 +25,7 @@ class CustomersQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                 Then("it should insert a new customer in the database") {
 
                     val customerId = ID.random()
+                    val stripeId = ID.random().toString()
 
                     val name = "John Doe"
                     val email = Email.create("johndoe@mail.com").getOrThrow()
@@ -33,6 +33,7 @@ class CustomersQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
 
                     customersQueries.createCustomer(
                         customerId,
+                        stripeId,
                         name,
                         email,
                         password,
@@ -56,6 +57,7 @@ class CustomersQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                     Then("it should update the customer in the database matching that id") {
 
                         val customerId = ID.random()
+                        val stripeId = ID.random().toString()
 
                         val name = "John Doe 1"
                         val email = Email.create("johndoe1@mail.com").getOrThrow()
@@ -64,6 +66,7 @@ class CustomersQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                         customersQueries.createCustomer(
                             customerId,
                             name,
+                            stripeId,
                             email,
                             password,
                             image_url = String(),
@@ -78,11 +81,13 @@ class CustomersQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                         val updatedEmail = Email.create("johndoe2@mail.com").getOrThrow()
                         val updatedPassword = Password.create("password02") { hash() }.getOrThrow()
 
-                        customersQueries.updateCustomerNameByid(updatedName, customerId)
-
-                        customersQueries.updateCustomerEmailById(updatedEmail, customerId)
-
-                        customersQueries.updateCustomerPasswordById(updatedPassword, customerId)
+                        customersQueries.updateCustomerById(
+                            updatedName,
+                            updatedEmail,
+                            updatedPassword,
+                            String(),
+                            customerId
+                        )
 
                         val dbUpdatedCustomer = customersQueries.getCustomerById(customerId).executeAsOneOrNull()
 
@@ -101,6 +106,7 @@ class CustomersQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                 Then("it should remove the customer from the database") {
 
                     val customerId = ID.random()
+                    val stripeId = ID.random().toString()
 
                     val name = "John Doe"
                     val email = Email.create("johndoe@email.com").getOrThrow()
@@ -108,6 +114,7 @@ class CustomersQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
 
                     customersQueries.createCustomer(
                         customerId,
+                        stripeId,
                         name,
                         email,
                         password,
