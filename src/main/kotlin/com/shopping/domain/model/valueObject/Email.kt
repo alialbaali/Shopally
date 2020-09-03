@@ -15,11 +15,16 @@ inline class Email(private val value: String) {
                     "x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
         )
 
-        fun create(email: String): Result<Email> =
-            if (email.matches(REGEX))
-                Result.success(Email(email))
+        fun create(email: String): Result<Email> {
+
+            val lowerCasedEmail = email.toLowerCase()
+
+            return if (lowerCasedEmail.matches(REGEX))
+                Result.success(Email(lowerCasedEmail))
             else
                 Result.failure(Throwable(Errors.INVALID_EMAIL))
+
+        }
 
     }
 

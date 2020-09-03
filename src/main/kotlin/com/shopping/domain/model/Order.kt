@@ -8,8 +8,16 @@ import java.time.LocalDate
 data class Order(
     val id: ID = ID.random(),
     val customerID: ID,
-    val productsIds: List<ID>,
+    val orderItems: Set<OrderItem>,
     val address: Address,
     val card: Card,
     val creationDate: LocalDate = LocalDate.now(),
-)
+) {
+
+    data class OrderItem(
+        val productId: ID,
+        val quantity: Long,
+        val price: Double,
+    )
+
+}

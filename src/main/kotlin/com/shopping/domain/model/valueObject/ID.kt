@@ -1,6 +1,6 @@
 package com.shopping.domain.model.valueObject
 
-import com.shopping.AuthenticationError
+import com.shopping.AuthorizationError
 import com.shopping.Errors
 import java.util.*
 
@@ -24,6 +24,6 @@ inline class ID(private val value: String) {
 
 }
 
-fun String.asID() = ID.from(this).getOrElse {
-    throw AuthenticationError(Errors.INVALID_ID)
+fun String.asID(): ID = ID.from(this).getOrElse {
+    throw AuthorizationError(Errors.INVALID_ID)
 }
