@@ -13,7 +13,6 @@ import io.kotest.matchers.collections.shouldExist
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContainIgnoringCase
-import io.kotest.matchers.throwable.shouldHaveMessage
 import org.koin.test.inject
 import kotlin.random.Random
 
@@ -162,9 +161,7 @@ class OrderItemsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                                 orderItem.price
                             )
                         }
-
                     }.message shouldContainIgnoringCase "UNIQUE CONSTRAINT FAILED"
-
                 }
             }
         }

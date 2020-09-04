@@ -1,0 +1,31 @@
+import com.shopping.domain.model.valueObject.ID;
+
+CREATE TABLE IF NOT EXISTS CustomerCart(
+customer_id TEXT AS ID REFERENCES Customers(id) NOT NULL,
+product_id TEXT AS ID REFERENCES Products(id) NOT NULL,
+quantity INTEGER NOT NULL,
+price REAL NOT NULL,
+UNIQUE(customer_id, product_id)
+);
+
+getOrderItemsByCustomerId:
+SELECT * FROM CustomerCart
+WHERE customer_id == ?;
+
+addOrderItem:
+INSERT INTO CustomerCart (customer_id, product_id, quantity, price)
+VALUES (?, ?, ?, ?);
+
+updateOrderItem:
+UPDATE CustomerCart
+SET quantity = ?
+WHERE customer_id == ? AND product_id == ?;
+
+deleteOrderItem:
+DELETE FROM CustomerCart
+WHERE customer_id == ? AND product_id == ?;
+
+deleteOrderItems:
+DELETE FROM CustomerCart
+WHERE customer_id == ?;
+

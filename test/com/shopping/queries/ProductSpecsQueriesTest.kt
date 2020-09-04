@@ -36,11 +36,9 @@ class ProductSpecsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                     dbSpecs.shouldNotBeEmpty()
                     dbSpecs shouldContain spec
                     dbSpecs[0] shouldBe spec
-
                 }
             }
         }
-
 
         Given("a product id and a key value pair ") {
             When("calling create spec") {
@@ -62,8 +60,6 @@ class ProductSpecsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                         val dbSpecsAfterDeletion = productSpecsQueries.getSpecsByProductId(productId).executeAsList()
 
                         dbSpecsAfterDeletion.size shouldBe 0
-
-
                     }
                 }
             }
@@ -91,12 +87,10 @@ class ProductSpecsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                         productSpecsQueries.getSpecsByProductId(productId).executeAsList()
                             .map { dbSpec -> dbSpec.toSpec() }
                             .any { it.second == "Windows" }.shouldBeTrue()
-
                     }
                 }
             }
         }
-
 
         Given("a product id and list of db specs") {
             When("calling delete specs by product id") {
@@ -116,13 +110,10 @@ class ProductSpecsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                     productSpecsQueries.deleteSpecsByProductId(productId)
 
                     productSpecsQueries.getSpecsByProductId(productId).executeAsList().shouldBeEmpty()
-
                 }
             }
         }
-
     }
-
 }
 
 private fun ProductSpecs.toSpec(): Pair<String, String> = key to value
