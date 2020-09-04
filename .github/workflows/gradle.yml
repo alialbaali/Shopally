@@ -17,8 +17,8 @@ jobs:
         with:
           java-version: 11
                 
+      - name: Run KtLint Formatter
+        run: ./ktlintFormat
+                
       - name: Build with Gradle
         run: ./gradlew build
-        
-      - name: Run KtLint Formatter
-        run: ./ktlintFormat 
