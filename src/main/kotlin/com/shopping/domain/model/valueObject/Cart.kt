@@ -7,5 +7,4 @@ inline class Cart(val value: MutableSet<Order.OrderItem>) {
     companion object {
         val EMPTY = Cart(mutableSetOf())
     }
-
 }

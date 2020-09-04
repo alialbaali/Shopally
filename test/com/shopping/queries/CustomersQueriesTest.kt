@@ -46,7 +46,6 @@ class CustomersQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                     dbCustomer.shouldNotBeNull()
                     dbCustomer.email shouldBe email
                     dbCustomer.name shouldBe name
-
                 }
             }
         }
@@ -95,7 +94,6 @@ class CustomersQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                         dbUpdatedCustomer.name shouldBe updatedName
                         dbUpdatedCustomer.email shouldBe updatedEmail
                         dbUpdatedCustomer.password shouldBe updatedPassword
-
                     }
                 }
             }
@@ -131,11 +129,8 @@ class CustomersQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                     val dbCustomerAfterDeletion = customersQueries.getCustomerById(customerId).executeAsOneOrNull()
 
                     dbCustomerAfterDeletion.shouldBeNull()
-
                 }
             }
         }
-
     }
-
 }

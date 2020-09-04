@@ -31,7 +31,7 @@ fun String.hash(): String {
 
 fun Date.toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(this.toInstant(), ZoneId.systemDefault())
 
-fun LocalDateTime.toDate(): Date = Date.from(this.atZone(ZoneId.systemDefault()).toInstant());
+fun LocalDateTime.toDate(): Date = Date.from(this.atZone(ZoneId.systemDefault()).toInstant())
 
 inline val PipelineContext<*, ApplicationCall>.jwtPayload: Payload
     get() = call.principal<JWTPrincipal>()?.payload ?: throw BadRequestException(Errors.INVALID_REQUEST)

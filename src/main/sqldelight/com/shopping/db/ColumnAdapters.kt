@@ -1,10 +1,10 @@
 package main.sqldelight.com.shopping.db
 
 import com.shopping.domain.model.Product
-import com.shopping.domain.model.valueObject.Balance
 import com.shopping.domain.model.valueObject.Email
 import com.shopping.domain.model.valueObject.ID
 import com.shopping.domain.model.valueObject.Password
+import com.shopping.domain.model.valueObject.Rating
 import com.squareup.sqldelight.ColumnAdapter
 import java.time.LocalDate
 
@@ -13,7 +13,6 @@ object IDColumnAdapter : ColumnAdapter<ID, String> {
     override fun decode(databaseValue: String): ID = ID(databaseValue)
 
     override fun encode(value: ID): String = value.toString()
-
 }
 
 object EmailColumnAdapter : ColumnAdapter<Email, String> {
@@ -21,39 +20,32 @@ object EmailColumnAdapter : ColumnAdapter<Email, String> {
     override fun decode(databaseValue: String): Email = Email(databaseValue)
 
     override fun encode(value: Email): String = value.toString()
-
 }
-
 
 object PasswordColumnAdapter : ColumnAdapter<Password, String> {
 
     override fun decode(databaseValue: String): Password = Password(databaseValue)
 
     override fun encode(value: Password): String = value.toString()
-
 }
-
 
 object LocalDateColumnAdapter : ColumnAdapter<LocalDate, String> {
 
     override fun decode(databaseValue: String): LocalDate = LocalDate.parse(databaseValue)
 
     override fun encode(value: LocalDate): String = value.toString()
-
 }
 
 object CategoryColumnAdapter : ColumnAdapter<Product.Category, String> {
 
     override fun decode(databaseValue: String): Product.Category = Product.Category.valueOf(databaseValue)
 
-    override fun encode(value: Product.Category): String = value.name
-
+    override fun encode(value: Product.Category): String = value.toString()
 }
 
-object BalanceColumnAdapter: ColumnAdapter<Balance, Double> {
+object RatingColumnAdapter : ColumnAdapter<Rating, String> {
 
-    override fun encode(value: Balance): Double = value.value
+    override fun decode(databaseValue: String): Rating = Rating.valueOf(databaseValue)
 
-    override fun decode(databaseValue: Double): Balance = Balance(databaseValue)
-
+    override fun encode(value: Rating): String = value.toString()
 }

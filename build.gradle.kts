@@ -37,6 +37,7 @@ ktlint {
     disabledRules.set(mutableListOf("no-wildcard-imports"))
     filter {
         exclude("**/generated/**")
+        exclude { element -> element.file.path.contains("generated/") }
         include("**/kotlin/**")
     }
 }

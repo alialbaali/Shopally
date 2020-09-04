@@ -15,9 +15,7 @@ inline class Password(private val value: String) {
             } else {
                 Result.failure(Throwable(Errors.INVALID_PASSWORD))
             }
-
     }
 
     override fun toString(): String = value
-
 }

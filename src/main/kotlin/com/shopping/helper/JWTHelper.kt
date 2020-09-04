@@ -25,7 +25,6 @@ class JWTHelper {
             .withIssuer(ISSUER)
             .withAudience(AUDIENCE)
             .build()
-
     }
 
     fun generateToken(
@@ -43,7 +42,6 @@ class JWTHelper {
         .withIssuer(ISSUER)
         .withAudience(AUDIENCE)
         .sign(ALGORITHM)
-
 }
 
 private fun JWTCreator.Builder.withClaims(claims: Map<String, Any>): JWTCreator.Builder {

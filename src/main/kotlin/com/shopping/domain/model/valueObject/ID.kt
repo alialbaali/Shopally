@@ -17,11 +17,9 @@ inline class ID(private val value: String) {
             } catch (e: Throwable) {
                 Result.failure(Throwable(Errors.INVALID_ID))
             }
-
     }
 
     override fun toString(): String = value
-
 }
 
 fun String.asID(): ID = ID.from(this).getOrElse {

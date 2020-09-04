@@ -48,7 +48,6 @@ class FakeCustomerRepository(
             customers[customerIndex] = customer
             Result.success(customer)
         }
-
     }
 
     override suspend fun updateCustomerImageById(customerId: ID, imageFile: File): Result<String> {
@@ -67,7 +66,6 @@ class FakeCustomerRepository(
             Result.success(customerId)
         else
             Result.failure(Throwable(Errors.INVALID_ID))
-
 
     override suspend fun countAddressesByCustomerId(customerId: ID): Result<Long> {
         val addressesCount = addresses.count { entry -> entry.key == customerId }
@@ -96,5 +94,4 @@ class FakeCustomerRepository(
         cards[customerId] = card
         return Result.success(card)
     }
-
 }

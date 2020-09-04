@@ -1,11 +1,11 @@
 package com.shopping.domain.model.valueObject
 
-import io.kotest.core.spec.style.BehaviorSpec
+import com.shopping.DefaultSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 
-class EmailTest : BehaviorSpec() {
+class EmailTest : DefaultSpec() {
 
     init {
 
@@ -17,7 +17,6 @@ class EmailTest : BehaviorSpec() {
 
                     result.shouldNotBeNull()
                     result.toString() shouldBe "johndoe@mail.com"
-
                 }
             }
         }
@@ -29,7 +28,6 @@ class EmailTest : BehaviorSpec() {
                     val email = Email.create("johndoe@mail").getOrNull()
 
                     email.shouldBeNull()
-
                 }
             }
         }
@@ -41,7 +39,6 @@ class EmailTest : BehaviorSpec() {
                     val email = Email.create("johndoe@").getOrNull()
 
                     email.shouldBeNull()
-
                 }
             }
         }
@@ -53,11 +50,8 @@ class EmailTest : BehaviorSpec() {
                     val email = Email.create("johndoe").getOrNull()
 
                     email.shouldBeNull()
-
                 }
             }
         }
-
     }
-
 }

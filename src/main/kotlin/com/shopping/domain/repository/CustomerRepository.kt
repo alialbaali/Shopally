@@ -29,5 +29,4 @@ interface CustomerRepository {
     suspend fun createCardByCustomerId(customerId: ID, card: Card): Result<Card>
 
     suspend fun countCardsByCustomerId(customerId: ID): Result<Long>
-
 }

@@ -32,7 +32,6 @@ class CloudinaryDataSource(private val cloudinary: Cloudinary) : CloudDataSource
         val imageUrl = response[SECURE_URL] as String? ?: return Result.failure(Throwable())
 
         imageUrl
-
     }
 
     override fun deleteImage(imageId: String, options: Map<String, String>): Result<Unit> = runCatching {
@@ -45,7 +44,5 @@ class CloudinaryDataSource(private val cloudinary: Cloudinary) : CloudDataSource
             Result.success(Unit)
         else
             Result.failure(Throwable())
-
     }
-
 }

@@ -1,4 +1,4 @@
-package com.shopping.domain.dto
+package com.shopping.domain.dto.customer
 
 import com.shopping.AuthenticationError
 import com.shopping.domain.model.valueObject.Email
@@ -17,5 +17,4 @@ class SignInRequest(
     operator fun component2(): Password = Password.create(password) { hash() }.getOrElse {
         throw AuthenticationError(it.message)
     }
-
 }

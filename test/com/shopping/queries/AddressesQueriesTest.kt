@@ -46,7 +46,6 @@ class AddressesQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                         addresses.shouldNotBeEmpty()
                         addressesCount shouldBe 1
                         addresses.find { it.name == name }.shouldNotBeNull()
-
                     }
                 }
             }
@@ -73,7 +72,6 @@ class AddressesQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                             line,
                             zipCode
                         )
-
                     }
 
                     val addressesCount = customerAddressesQueries.countAddressesByCustomerId(customerId).executeAsOne()
@@ -86,11 +84,8 @@ class AddressesQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                         customerAddressesQueries.countAddressesByCustomerId(customerId).executeAsOne()
 
                     addressesCountAfterDeletion shouldBeExactly 0
-
                 }
             }
         }
-
     }
-
 }

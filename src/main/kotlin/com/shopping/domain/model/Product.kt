@@ -21,5 +21,4 @@ data class Product(
     enum class Category {
         VideoGames, Movies, Books, Other
     }
-
 }

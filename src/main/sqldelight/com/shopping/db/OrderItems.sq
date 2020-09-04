@@ -1,0 +1,21 @@
+import com.shopping.domain.model.valueObject.ID;
+
+CREATE TABLE IF NOT EXISTS OrderItems (
+order_id TEXT AS ID REFERENCES Orders(id) NOT NULL,
+product_id TEXT AS ID REFERENCES Products(id) NOT NULL,
+quantity INTEGER NOT NULL,
+price REAL NOT NULL,
+UNIQUE(order_id, product_id)
+);
+
+getOrderItemsByOrderId:
+SELECT * FROM OrderItems
+WHERE order_id == ?;
+
+getOrderItemsByProductId:
+SELECT * FROM OrderItems
+WHERE product_id == ?;
+
+createOrderItem:
+INSERT INTO OrderItems (order_id, product_id, quantity, price)
+VALUES (?, ?, ?, ?);

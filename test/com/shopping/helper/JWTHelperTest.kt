@@ -1,23 +1,18 @@
 package com.shopping.helper
 
-import com.shopping.KoinTestListener
-import com.shopping.di.helperModule
+import com.shopping.DefaultSpec
 import com.shopping.domain.model.valueObject.ID
+import com.shopping.helperModule
 import com.shopping.toLocalDateTime
-import io.kotest.core.listeners.TestListener
-import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import org.koin.test.KoinTest
 import org.koin.test.inject
 import java.time.LocalDateTime
 
-class JWTHelperTest : BehaviorSpec(), KoinTest {
+class JWTHelperTest : DefaultSpec(helperModule) {
 
     private val jwtHelper by inject<JWTHelper>()
-
-    override fun listeners(): List<TestListener> = listOf(KoinTestListener(helperModule))
 
     init {
 
@@ -35,7 +30,6 @@ class JWTHelperTest : BehaviorSpec(), KoinTest {
 
                     subject.shouldNotBeNull()
                     subject shouldBe id.toString()
-
                 }
             }
         }
@@ -65,7 +59,6 @@ class JWTHelperTest : BehaviorSpec(), KoinTest {
 
                     decodedJwtNotBefore.shouldNotBeNull()
                     decodedJwtNotBefore.toLocalDateTime().toLocalDate() shouldBe notBefore.toLocalDate()
-
                 }
             }
         }
@@ -91,12 +84,9 @@ class JWTHelperTest : BehaviorSpec(), KoinTest {
 
                         decodedJwtClaims.shouldNotBeNull()
                         decodedJwtClaims.keys shouldContainAll claims.keys
-
                     }
                 }
             }
         }
-
     }
-
 }

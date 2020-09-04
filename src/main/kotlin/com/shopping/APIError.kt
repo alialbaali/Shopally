@@ -38,5 +38,4 @@ object Errors {
     const val INVALID_IMAGE = "Invalid image url"
     const val INVALID_ISBN = "Invalid ISBN"
     const val INVALID_ID = "Invalid ID"
-
 }

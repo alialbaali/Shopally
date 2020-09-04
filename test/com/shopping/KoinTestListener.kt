@@ -18,5 +18,4 @@ class KoinTestListener(private vararg val modules: Module) : TestListener {
         super.afterEach(testCase, result)
         stopKoin()
     }
-
 }

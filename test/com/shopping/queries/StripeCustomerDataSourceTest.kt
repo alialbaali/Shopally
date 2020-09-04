@@ -32,7 +32,6 @@ class StripeCustomerDataSourceTest : DefaultSpec(dataSourceModule) {
 
                     stripeCustomer.name shouldBeEqualIgnoringCase name
                     stripeCustomer.email shouldBeEqualIgnoringCase email
-
                 }
             }
         }
@@ -63,12 +62,10 @@ class StripeCustomerDataSourceTest : DefaultSpec(dataSourceModule) {
 
                         updatedStripeCustomer.name shouldNotBe stripeCustomer.name
                         updatedStripeCustomer.email shouldNotBe stripeCustomer.email
-
                     }
                 }
             }
         }
-
 
         Given("a stripe customer id") {
             When("deleting the customer") {
@@ -82,13 +79,8 @@ class StripeCustomerDataSourceTest : DefaultSpec(dataSourceModule) {
                     shouldNotThrowAny {
                         stripeCustomerDataSource.deleteStripeCustomerById(stripeCustomerId).getOrThrow()
                     } shouldBe stripeCustomerId
-
                 }
             }
         }
-
-
     }
-
-
 }

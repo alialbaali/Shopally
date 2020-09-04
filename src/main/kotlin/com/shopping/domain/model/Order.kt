@@ -19,5 +19,4 @@ data class Order(
         val quantity: Long,
         val price: Double,
     )
-
 }

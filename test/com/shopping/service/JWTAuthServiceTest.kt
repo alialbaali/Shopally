@@ -1,29 +1,19 @@
 package com.shopping.service
 
-import com.shopping.APIError
-import com.shopping.AuthenticationError
-import com.shopping.KoinTestListener
-import com.shopping.di.helperModule
-import com.shopping.di.serviceModule
-import com.shopping.domain.dto.SignInRequest
-import com.shopping.domain.dto.SignUpRequest
+import com.shopping.*
+import com.shopping.domain.dto.customer.SignInRequest
+import com.shopping.domain.dto.customer.SignUpRequest
 import com.shopping.domain.model.valueObject.ID
 import com.shopping.domain.service.AuthService
-import com.shopping.FakeRepositoryModule
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
-import io.kotest.core.listeners.TestListener
-import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.string.shouldNotBeEmpty
-import org.koin.test.KoinTest
 import org.koin.test.inject
 
-class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
+class JWTAuthServiceTest : DefaultSpec(testServiceModule, helperModule, fakeRepositoryModule) {
 
     private val authService by inject<AuthService>()
-
-    override fun listeners(): List<TestListener> = listOf(KoinTestListener(serviceModule, helperModule, FakeRepositoryModule))
 
     init {
 
@@ -42,7 +32,6 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
                     tokenResponse.shouldNotBeNull()
                     tokenResponse.accessToken.shouldNotBeEmpty()
                     tokenResponse.refreshToken.shouldNotBeEmpty()
-
                 }
             }
         }
@@ -60,7 +49,6 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
                     shouldThrow<APIError> {
                         authService.signUp(signUpRequest)
                     }
-
                 }
             }
         }
@@ -71,14 +59,14 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
 
                     val signUpRequest = SignUpRequest(
                         "John",
-                        "johndoe@mail.com",
+                        "johndoe3@mail.com",
                         "password0"
                     )
 
                     authService.signUp(signUpRequest)
 
                     val signInRequest = SignInRequest(
-                        "johndoe@mail.com",
+                        "johndoe3@mail.com",
                         "password0"
                     )
 
@@ -87,7 +75,6 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
                     tokenResponse.shouldNotBeNull()
                     tokenResponse.accessToken.shouldNotBeEmpty()
                     tokenResponse.refreshToken.shouldNotBeEmpty()
-
                 }
             }
         }
@@ -104,7 +91,6 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
                     shouldThrow<APIError> {
                         authService.signIn(signInRequest)
                     }
-
                 }
             }
         }
@@ -115,7 +101,7 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
 
                     val signUpRequest = SignUpRequest(
                         "John",
-                        "johndoe@mail.com",
+                        "johndoe@mail1.com",
                         "password0"
                     )
 
@@ -124,7 +110,6 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
                     shouldThrowExactly<AuthenticationError> {
                         authService.signUp(signUpRequest)
                     }
-
                 }
             }
         }
@@ -134,14 +119,13 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
                 Then("it should throw an Authentication Error exception") {
 
                     val signInRequest = SignInRequest(
-                        "johndoe@mail.com",
+                        "johndoe@mail0.com",
                         "password0"
                     )
 
                     shouldThrowExactly<AuthenticationError> {
                         authService.signIn(signInRequest)
                     }
-
                 }
             }
         }
@@ -157,7 +141,6 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
                     tokenResponse.shouldNotBeNull()
                     tokenResponse.accessToken.shouldNotBeEmpty()
                     tokenResponse.refreshToken.shouldNotBeEmpty()
-
                 }
             }
         }
@@ -168,14 +151,11 @@ class JWTAuthServiceTest : BehaviorSpec(), KoinTest {
 
                     val id = "3232-43209423-43242-3223"
 
-                    shouldThrowExactly<AuthenticationError> {
+                    shouldThrowExactly<AuthorizationError> {
                         authService.refreshToken(id)
                     }
-
                 }
             }
         }
-
     }
-
 }

@@ -1,12 +1,12 @@
 package com.shopping.domain.model.valueObject
 
+import com.shopping.DefaultSpec
 import com.shopping.hash
-import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.comparables.shouldNotBeEqualComparingTo
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 
-class PasswordTest : BehaviorSpec() {
+class PasswordTest : DefaultSpec() {
 
     init {
 
@@ -22,7 +22,6 @@ class PasswordTest : BehaviorSpec() {
 
                     hashedPassword.shouldNotBeNull()
                     hashedPassword.toString() shouldNotBeEqualComparingTo password
-
                 }
             }
         }
@@ -38,11 +37,9 @@ class PasswordTest : BehaviorSpec() {
                     val hashedPassword = inlinedPassword.getOrNull()
 
                     hashedPassword.shouldBeNull()
-
                 }
             }
         }
-
 
         Given("symbol characters and one number password") {
             When("creating an inline Password class") {
@@ -56,11 +53,8 @@ class PasswordTest : BehaviorSpec() {
 
                     hashedPassword.shouldNotBeNull()
                     hashedPassword.toString() shouldNotBeEqualComparingTo password
-
                 }
             }
         }
-
     }
-
 }

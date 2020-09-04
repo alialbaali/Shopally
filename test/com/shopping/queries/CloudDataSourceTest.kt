@@ -32,7 +32,6 @@ class CloudDataSourceTest : DefaultSpec(dataSourceModule) {
                     shouldThrowAny {
                         cloudDataSource.uploadImage(emptyFile).getOrThrow()
                     }
-
                 }
             }
         }
@@ -46,7 +45,6 @@ class CloudDataSourceTest : DefaultSpec(dataSourceModule) {
                     }
 
                     imageUrl.shouldNotBeEmpty()
-
                 }
             }
         }
@@ -66,7 +64,6 @@ class CloudDataSourceTest : DefaultSpec(dataSourceModule) {
                         imageUrl.shouldNotBeEmpty()
                         imageUrl shouldContainIgnoringCase imageId
                         imageUrl shouldContainIgnoringCase folderName
-
                     }
                 }
             }
@@ -86,16 +83,12 @@ class CloudDataSourceTest : DefaultSpec(dataSourceModule) {
                         imageUrl.shouldNotBeEmpty()
                         imageUrl shouldContainIgnoringCase imageId
 
-
                         shouldNotThrowAny {
                             cloudDataSource.deleteImage(imageId).getOrThrow()
                         } shouldBe Unit
-
                     }
                 }
             }
         }
-
     }
-
 }

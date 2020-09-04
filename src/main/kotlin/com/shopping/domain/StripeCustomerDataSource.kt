@@ -13,5 +13,4 @@ interface StripeCustomerDataSource {
     suspend fun updateStripeCustomerById(stripeCustomerId: String, name: String, email: String): Result<StripeCustomer>
 
     suspend fun deleteStripeCustomerById(stripeCustomerId: String): Result<String>
-
 }

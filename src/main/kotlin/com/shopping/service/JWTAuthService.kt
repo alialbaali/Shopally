@@ -2,9 +2,9 @@ package com.shopping.service
 
 import com.shopping.AuthenticationError
 import com.shopping.Errors
-import com.shopping.domain.dto.SignInRequest
-import com.shopping.domain.dto.SignUpRequest
-import com.shopping.domain.dto.TokenResponse
+import com.shopping.domain.dto.customer.SignInRequest
+import com.shopping.domain.dto.customer.SignUpRequest
+import com.shopping.domain.dto.customer.TokenResponse
 import com.shopping.domain.model.Customer
 import com.shopping.domain.model.valueObject.ID
 import com.shopping.domain.model.valueObject.asID
@@ -21,6 +21,8 @@ class JWTAuthService(private val customerRepository: CustomerRepository) : AuthS
 
         val (name, email, password) = signUpRequest
 
+        customerRepository.getCustomerByEmail(email).exceptionOrNull() ?: throw AuthenticationError(Errors.INVALID_EMAIL)
+
         val customer = Customer(name = name, email = email, password = password)
 
         customerRepository.createCustomer(customer).getOrElse {
@@ -28,7 +30,6 @@ class JWTAuthService(private val customerRepository: CustomerRepository) : AuthS
         }
 
         return createTokenResponse(customer.id)
-
     }
 
     override suspend fun signIn(signInRequest: SignInRequest): TokenResponse {
@@ -43,7 +44,6 @@ class JWTAuthService(private val customerRepository: CustomerRepository) : AuthS
             createTokenResponse(customer.id)
         else
             throw AuthenticationError(Errors.INVALID_CREDENTIALS)
-
     }
 
     override suspend fun refreshToken(customerId: String): TokenResponse = createTokenResponse(customerId.asID())
@@ -56,8 +56,6 @@ class JWTAuthService(private val customerRepository: CustomerRepository) : AuthS
 
         val refreshToken = jwtHelper.generateToken(id, expiresAt = LocalDateTime.now().plusDays(30))
 
-        return TokenResponse(accessToken, refreshToken)
-
+        return TokenResponse(id.toString(), accessToken, refreshToken)
     }
-
 }
