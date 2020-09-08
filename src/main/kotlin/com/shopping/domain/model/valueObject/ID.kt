@@ -23,5 +23,5 @@ inline class ID(private val value: String) {
 }
 
 fun String.asID(): ID = ID.from(this).getOrElse {
-    throw AuthorizationError(Errors.INVALID_ID)
+    throw AuthorizationError(it.message)
 }

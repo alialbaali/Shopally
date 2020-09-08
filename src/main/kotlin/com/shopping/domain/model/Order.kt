@@ -17,6 +17,5 @@ data class Order(
     data class OrderItem(
         val productId: ID,
         val quantity: Long,
-        val price: Double,
     )
 }
