@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 data class Order(
     val id: ID = ID.random(),
-    val customerID: ID,
+    val customerId: ID,
     val orderItems: Set<OrderItem>,
     val address: Address,
     val card: Card,
