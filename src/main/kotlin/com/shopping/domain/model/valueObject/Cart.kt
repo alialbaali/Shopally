@@ -2,9 +2,11 @@ package com.shopping.domain.model.valueObject
 
 import com.shopping.domain.model.Order
 
-inline class Cart(val value: Set<Order.OrderItem>) {
+typealias CartItem = Order.OrderItem
+
+inline class Cart(val value: Set<CartItem>) {
 
     companion object {
-        val EMPTY = Cart(setOf())
+        val EMPTY = Cart(emptySet())
     }
 }

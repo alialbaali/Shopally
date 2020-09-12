@@ -10,7 +10,6 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.koin.test.inject
-import kotlin.random.Random
 
 class CustomerCartQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
 
@@ -18,106 +17,103 @@ class CustomerCartQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
 
     init {
 
-        Given("a list of order items") {
+        Given("a list of cart items") {
             And("a unique customer id") {
-                When("creating the order items") {
+                When("creating the cart items") {
                     Then("we should be able to query them by the customer id") {
 
                         val customerId = ID.random()
 
                         shouldNotThrowAny {
                             repeat(10) {
-                                customerCartQueries.addOrderItem(
+                                customerCartQueries.createCartItem(
                                     customerId,
                                     product_id = ID.random(),
                                     quantity = it.toLong(),
-                                    price = it.times(it).times(Random.nextDouble(100.0))
                                 )
                             }
                         }
 
-                        val orderItems = shouldNotThrowAny {
-                            customerCartQueries.getOrderItemsByCustomerId(customerId).executeAsList()
+                        val cartItems = shouldNotThrowAny {
+                            customerCartQueries.getCartItemsByCustomerId(customerId).executeAsList()
                         }
 
-                        orderItems shouldHaveSize 10
+                        cartItems shouldHaveSize 10
                     }
                 }
             }
         }
 
-        Given("a list of order items ") {
+        Given("a list of cart items ") {
             And("a unique customer id") {
-                When("creating the order items") {
+                When("creating the cart items") {
                     And("update all of them") {
-                        Then("all order items with that customer id should be updated") {
+                        Then("all cart items with that customer id should be updated") {
 
                             val customerId = ID.random()
 
                             shouldNotThrowAny {
                                 repeat(10) {
-                                    customerCartQueries.addOrderItem(
+                                    customerCartQueries.createCartItem(
                                         customerId,
                                         product_id = ID.random(),
                                         quantity = it.toLong(),
-                                        price = it.times(it).times(Random.nextDouble(100.0))
                                     )
                                 }
                             }
 
-                            val orderItems = shouldNotThrowAny {
-                                customerCartQueries.getOrderItemsByCustomerId(customerId).executeAsList()
-                            }
-
-                            val updatedOrderItems = orderItems.map { orderItem ->
-                                orderItem.copy(
-                                    quantity = orderItem.quantity.times(orderItem.quantity)
-                                )
-                            }.sortedBy { it.quantity }
+                            val updatedCartItems = customerCartQueries.getCartItemsByCustomerId(customerId)
+                                .executeAsList()
+                                .map { cartItem ->
+                                    cartItem.copy(quantity = cartItem.quantity.times(cartItem.quantity))
+                                }.sortedBy { it.quantity }
 
                             shouldNotThrowAny {
-                                updatedOrderItems.forEach { orderItem ->
-                                    customerCartQueries.updateOrderItem(
-                                        orderItem.quantity,
+                                updatedCartItems.forEach { cartItem ->
+                                    customerCartQueries.updateCartItem(
+                                        cartItem.quantity,
                                         customerId,
-                                        orderItem.product_id
+                                        cartItem.product_id
                                     )
                                 }
                             }
 
-                            val dbOrderItems = customerCartQueries.getOrderItemsByCustomerId(customerId).executeAsList()
+                            val dbCartItems = customerCartQueries.getCartItemsByCustomerId(customerId)
+                                .executeAsList()
                                 .sortedBy { it.quantity }
 
-                            dbOrderItems shouldBe updatedOrderItems
+                            dbCartItems shouldBe updatedCartItems
                         }
                     }
                 }
             }
         }
 
-        Given("a list of order items  ") {
+        Given("a non-empty cart") {
             And("a unique customer id") {
-                When("creating the order items") {
-                    Then("we should be able to delete all of them") {
+                When("clearing the cart by customer id") {
+                    Then("it should delete all the cart items with that customer id") {
 
                         val customerId = ID.random()
 
                         shouldNotThrowAny {
                             repeat(10) {
-                                customerCartQueries.addOrderItem(
+                                customerCartQueries.createCartItem(
                                     customerId,
                                     product_id = ID.random(),
                                     quantity = it.toLong(),
-                                    price = it.times(it).times(Random.nextDouble(100.0))
                                 )
                             }
                         }
 
-                        customerCartQueries.getOrderItemsByCustomerId(customerId).executeAsList() shouldHaveSize 10
+                        customerCartQueries.getCartItemsByCustomerId(customerId)
+                            .executeAsList() shouldHaveSize 10
 
-                        customerCartQueries.deleteOrderItems(customerId)
+                        customerCartQueries.deleteCartItemsByCustomerId(customerId)
 
-                        customerCartQueries.getOrderItemsByCustomerId(customerId).executeAsList().shouldBeEmpty()
+                        customerCartQueries.getCartItemsByCustomerId(customerId)
+                            .executeAsList()
+                            .shouldBeEmpty()
                     }
                 }
             }
