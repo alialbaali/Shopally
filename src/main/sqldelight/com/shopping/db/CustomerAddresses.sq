@@ -6,10 +6,15 @@ name TEXT NOT NULL,
 country TEXT NOT NULL,
 city TEXT NOT NULL,
 line TEXT NOT NULL,
-zip_code TEXT NOT NULL
+zip_code TEXT NOT NULL,
+UNIQUE(customer_id, name)
 );
 
-getAddressesByCustomerID:
+getAddress:
+SELECT * FROM CustomerAddresses
+WHERE customer_id == ? AND name == ?;
+
+getAddressesByCustomerId:
 SELECT * FROM CustomerAddresses
 WHERE customer_id == ?;
 
@@ -21,6 +26,10 @@ createAddress:
 INSERT INTO CustomerAddresses (customer_id, name, country, city, line, zip_code)
 VALUES (?, ?, ?, ?, ?, ?);
 
-deleteAddressesByCustomerID:
+deleteAddress:
+DELETE FROM CustomerAddresses
+WHERE customer_id == ? AND name == ?;
+
+deleteAddressesByCustomerId:
 DELETE FROM CustomerAddresses
 WHERE customer_id == ?;

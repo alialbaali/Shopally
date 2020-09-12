@@ -5,14 +5,13 @@ import com.shopping.dataSourceModule
 import com.shopping.db.CustomerAddressesQueries
 import com.shopping.dbModule
 import com.shopping.domain.model.valueObject.ID
-import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.longs.shouldBeExactly
 import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.koin.test.inject
 
-class AddressesQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
+class CustomerAddressesQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
 
     private val customerAddressesQueries by inject<CustomerAddressesQueries>()
 
@@ -39,13 +38,14 @@ class AddressesQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                             zipCode
                         )
 
-                        val addresses = customerAddressesQueries.getAddressesByCustomerID(customerId).executeAsList()
+                        val address = customerAddressesQueries.getAddress(customerId, name)
+                            .executeAsOneOrNull()
 
-                        val addressesCount = customerAddressesQueries.countAddressesByCustomerId(customerId).executeAsOne()
+                        val addressesCount = customerAddressesQueries.countAddressesByCustomerId(customerId)
+                            .executeAsOne()
 
-                        addresses.shouldNotBeEmpty()
+                        address.shouldNotBeNull()
                         addressesCount shouldBe 1
-                        addresses.find { it.name == name }.shouldNotBeNull()
                     }
                 }
             }
@@ -74,14 +74,15 @@ class AddressesQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                         )
                     }
 
-                    val addressesCount = customerAddressesQueries.countAddressesByCustomerId(customerId).executeAsOne()
+                    val addressesCount = customerAddressesQueries.countAddressesByCustomerId(customerId)
+                        .executeAsOne()
 
                     addressesCount shouldBeGreaterThanOrEqual 5
 
-                    customerAddressesQueries.deleteAddressesByCustomerID(customerId)
+                    customerAddressesQueries.deleteAddressesByCustomerId(customerId)
 
-                    val addressesCountAfterDeletion =
-                        customerAddressesQueries.countAddressesByCustomerId(customerId).executeAsOne()
+                    val addressesCountAfterDeletion = customerAddressesQueries.countAddressesByCustomerId(customerId)
+                        .executeAsOne()
 
                     addressesCountAfterDeletion shouldBeExactly 0
                 }
