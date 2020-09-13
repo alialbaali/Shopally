@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS OrderItems (
 order_id TEXT AS ID REFERENCES Orders(id) NOT NULL,
 product_id TEXT AS ID REFERENCES Products(id) NOT NULL,
 quantity INTEGER NOT NULL,
-price REAL NOT NULL,
 UNIQUE(order_id, product_id)
 );
 
@@ -17,5 +16,5 @@ SELECT * FROM OrderItems
 WHERE product_id == ?;
 
 createOrderItem:
-INSERT INTO OrderItems (order_id, product_id, quantity, price)
-VALUES (?, ?, ?, ?);
+INSERT INTO OrderItems (order_id, product_id, quantity)
+VALUES (?, ?, ?);
