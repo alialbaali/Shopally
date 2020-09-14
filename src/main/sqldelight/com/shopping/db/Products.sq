@@ -2,7 +2,7 @@ import com.shopping.domain.model.Product.Category;
 import com.shopping.domain.model.valueObject.ID;
 import java.time.LocalDate;
 
-CREATE TABLE Products (
+CREATE TABLE IF NOT EXISTS Products (
 id              TEXT    AS ID          NOT NULL    PRIMARY KEY,
 category        TEXT AS Category    NOT NULL,
 brand           TEXT           NOT NULL,
@@ -14,7 +14,8 @@ creation_date   TEXT    AS LocalDate   NOT NULL
 );
 
 getProducts:
-SELECT * FROM Products;
+SELECT * FROM Products
+LIMIT ? OFFSET ?;
 
 getProductById:
 SELECT * FROM Products
@@ -24,11 +25,11 @@ createProduct:
 INSERT INTO Products (id, category, brand, name, description, price, release_date, creation_date)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
-updateProduct:
+updateProductByID:
 UPDATE Products
 SET category = ?, brand = ?, name = ?, description = ?, price = ?, release_date = ?
 WHERE id == ?;
 
-deleteProduct:
+deleteProductById:
 DELETE FROM Products
 WHERE id == ?;
