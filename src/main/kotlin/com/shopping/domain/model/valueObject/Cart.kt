@@ -7,6 +7,6 @@ typealias CartItem = Order.OrderItem
 inline class Cart(val value: Set<CartItem>) {
 
     companion object {
-        val EMPTY = Cart(emptySet())
+        val Empty = Cart(emptySet())
     }
 }

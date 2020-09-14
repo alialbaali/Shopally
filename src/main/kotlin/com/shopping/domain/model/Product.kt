@@ -18,6 +18,11 @@ data class Product(
     val creationDate: LocalDate = LocalDate.now(),
 ) {
 
+    val avgRating: Double
+        get() = reviews.sumBy { review ->
+            review.rating.ordinal.plus(1)
+        }.div(5.0)
+
     enum class Category {
         VideoGames, Movies, Books, Other
     }

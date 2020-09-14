@@ -33,7 +33,6 @@ class IDTest : DefaultSpec() {
                     shouldThrowExactly<AuthorizationError> {
                         id.asID()
                     }
-
                 }
             }
         }

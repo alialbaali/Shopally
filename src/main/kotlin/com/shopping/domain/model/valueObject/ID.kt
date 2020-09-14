@@ -15,7 +15,7 @@ inline class ID(private val value: String) {
                 val uuid = UUID.fromString(id)
                 Result.success(ID(uuid.toString()))
             } catch (e: Throwable) {
-                Result.failure(Throwable(Errors.INVALID_ID))
+                Result.failure(Throwable(Errors.InvalidId))
             }
     }
 
