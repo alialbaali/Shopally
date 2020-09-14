@@ -1,0 +1,33 @@
+import com.shopping.domain.model.valueObject.ID;
+import com.shopping.domain.model.valueObject.Rating;
+import java.time.LocalDate;
+
+CREATE TABLE IF NOT EXISTS ProductReviews (
+product_id TEXT AS ID REFERENCES Products(id) NOT NULL,
+customer_id TEXT AS ID REFERENCES Customers(id) NOT NULL,
+rating TEXT AS Rating NOT NULL,
+description TEXT,
+creation_date TEXT AS LocalDate NOT NULL,
+UNIQUE(product_id, customer_id)
+);
+
+getReviewsByProductId:
+SELECT * FROM ProductReviews
+WHERE product_id == ?;
+
+getReview:
+SELECT * FROM ProductReviews
+WHERE product_id == ? AND customer_id == ?;
+
+createReview:
+INSERT INTO ProductReviews
+VALUES (?, ?, ?, ?, ?);
+
+updateReview:
+UPDATE ProductReviews
+SET rating = ?,  description = ?
+WHERE product_id == ? AND customer_id == ?;
+
+deleteReview:
+DELETE FROM ProductReviews
+WHERE product_id == ? AND customer_id == ?;
