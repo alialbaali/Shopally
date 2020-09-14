@@ -23,7 +23,6 @@ class CustomerCardsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
 
                         val customerId = ID.random()
 
-
                         shouldNotThrowAny {
                             customerCardsQueries.createCard(
                                 customerId,
@@ -35,11 +34,9 @@ class CustomerCardsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                         val dbCards = customerCardsQueries.getCardsByCustomerId(customerId)
                             .executeAsList()
 
-
                         dbCards.shouldNotBeEmpty()
                         dbCards shouldExist { it.customer_id == customerId }
                         dbCards.any { it.card_last_4_numbers == 4242L }.shouldBeTrue()
-
                     }
                 }
             }
@@ -72,7 +69,6 @@ class CustomerCardsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                         customerCardsQueries.getCardsByCustomerId(customerId)
                             .executeAsList()
                             .shouldBeEmpty()
-
                     }
                 }
             }
@@ -86,19 +82,17 @@ class CustomerCardsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
 
                             val customerId = ID.random()
 
-                            repeat(10){
+                            repeat(10) {
 
                                 customerCardsQueries.createCard(
                                     customerId,
                                     ID.random().toString(),
                                     "$it$it$it$it".toLong(),
                                 )
-
                             }
 
                             customerCardsQueries.getCardsByCustomerId(customerId)
                                 .executeAsList() shouldHaveAtLeastSize 10
-
 
                             shouldNotThrowAny {
                                 customerCardsQueries.deleteCardsByCustomerId(customerId)
@@ -106,13 +100,10 @@ class CustomerCardsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
 
                             customerCardsQueries.getCardsByCustomerId(customerId)
                                 .executeAsList() shouldHaveSize 0
-
                         }
                     }
                 }
             }
         }
-
     }
-
 }

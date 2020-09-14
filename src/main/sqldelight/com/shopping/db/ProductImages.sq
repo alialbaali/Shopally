@@ -1,0 +1,23 @@
+import com.shopping.domain.model.valueObject.ID;
+
+CREATE TABLE IF NOT EXISTS ProductImages (
+product_id TEXT AS ID REFERENCES Products(id) NOT NULL,
+image_url TEXT NOT NULL UNIQUE,
+UNIQUE(product_id, image_url)
+);
+
+getImagesUrlByProductId:
+SELECT * FROM ProductImages
+WHERE product_id == ?;
+
+createImageUrl:
+INSERT INTO ProductImages (product_id, image_url)
+VALUES (?, ?);
+
+deleteImageUrl:
+DELETE FROM ProductImages
+WHERE image_url == ?;
+
+deleteImagesByProductId:
+DELETE FROM ProductImages
+WHERE product_id == ?;
