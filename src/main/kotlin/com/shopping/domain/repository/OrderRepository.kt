@@ -5,10 +5,9 @@ import com.shopping.domain.model.valueObject.ID
 
 interface OrderRepository {
 
-    suspend fun getOrderById(orderId: ID): Result<Order>
-
     suspend fun getOrdersByCustomerId(customerId: ID): Result<List<Order>>
 
-    suspend fun createOrder(order: Order): Result<Order>
+    suspend fun getOrderById(orderId: ID): Result<Order>
 
+    suspend fun createOrder(order: Order): Result<Order>
 }
