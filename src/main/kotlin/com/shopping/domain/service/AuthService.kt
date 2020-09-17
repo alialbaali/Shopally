@@ -1,25 +1,23 @@
 package com.shopping.domain.service
 
-import com.shopping.AuthorizationError
 import com.shopping.Errors
+import com.shopping.authenticationError
 import com.shopping.domain.dto.customer.request.SignInRequest
 import com.shopping.domain.dto.customer.request.SignUpRequest
 import com.shopping.domain.dto.customer.response.TokenResponse
 import com.shopping.domain.model.valueObject.asID
 import com.shopping.domain.repository.CustomerRepository
 import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.get
 
 interface AuthService {
 
     companion object : KoinComponent {
-
-        private val customerRepository by inject<CustomerRepository>()
-
-        suspend fun validateCustomerById(customerId: String) =
-            customerRepository.getCustomerById(customerId.asID()).getOrElse {
-                throw AuthorizationError(Errors.InvalidRequest)
-            }
+        suspend fun validateCustomerById(customerId: String) {
+            get<CustomerRepository>()
+                .getCustomerById(customerId.asID())
+                .getOrElse { authenticationError(Errors.CustomerDoesntExist) }
+        }
     }
 
     suspend fun signUp(signUpRequest: SignUpRequest): TokenResponse

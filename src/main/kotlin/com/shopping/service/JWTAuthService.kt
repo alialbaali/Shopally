@@ -1,16 +1,16 @@
 package com.shopping.service
 
-import com.shopping.AuthenticationError
 import com.shopping.Errors
-import com.shopping.domain.dto.customer.SignInRequest
-import com.shopping.domain.dto.customer.SignUpRequest
-import com.shopping.domain.dto.customer.TokenResponse
+import com.shopping.authenticationError
+import com.shopping.domain.dto.customer.request.SignInRequest
+import com.shopping.domain.dto.customer.request.SignUpRequest
+import com.shopping.domain.dto.customer.response.TokenResponse
 import com.shopping.domain.model.Customer
-import com.shopping.domain.model.valueObject.ID
 import com.shopping.domain.model.valueObject.asID
 import com.shopping.domain.repository.CustomerRepository
 import com.shopping.domain.service.AuthService
 import com.shopping.helper.JWTHelper
+import com.shopping.notFoundError
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.LocalDateTime
@@ -21,34 +21,45 @@ class JWTAuthService(private val customerRepository: CustomerRepository) : AuthS
 
         val (name, email, password) = signUpRequest
 
-        customerRepository.getCustomerByEmail(email).exceptionOrNull() ?: throw AuthenticationError(Errors.INVALID_EMAIL)
+        customerRepository.getCustomerByEmail(email)
+            .exceptionOrNull() ?: authenticationError(Errors.UsedEmail)
 
         val customer = Customer(name = name, email = email, password = password)
 
-        customerRepository.createCustomer(customer).getOrElse {
-            throw AuthenticationError(it.message)
-        }
-
-        return createTokenResponse(customer.id)
+        return customerRepository.createCustomer(customer)
+            .fold(
+                onSuccess = { createTokenResponse(it) },
+                onFailure = { authenticationError(it.message) }
+            )
     }
 
     override suspend fun signIn(signInRequest: SignInRequest): TokenResponse {
 
         val (email, password) = signInRequest
 
-        val customer = customerRepository.getCustomerByEmail(email).getOrElse {
-            throw AuthenticationError(it.message)
-        }
-
-        return if (customer.password == password)
-            createTokenResponse(customer.id)
-        else
-            throw AuthenticationError(Errors.INVALID_CREDENTIALS)
+        return customerRepository.getCustomerByEmail(email)
+            .fold(
+                onSuccess = {
+                    if (it.password == password)
+                        createTokenResponse(it)
+                    else
+                        authenticationError(Errors.InvalidCredentials)
+                },
+                onFailure = { notFoundError(it.message) }
+            )
     }
 
-    override suspend fun refreshToken(customerId: String): TokenResponse = createTokenResponse(customerId.asID())
+    override suspend fun refreshToken(customerId: String): TokenResponse {
+        return customerRepository.getCustomerById(customerId.asID())
+            .fold(
+                onSuccess = { createTokenResponse(it) },
+                onFailure = { notFoundError(it.message) }
+            )
+    }
 
-    private fun createTokenResponse(id: ID): TokenResponse {
+    private fun createTokenResponse(customer: Customer): TokenResponse {
+
+        val id = customer.id
 
         val jwtHelper by inject<JWTHelper>()
 

@@ -3,27 +3,27 @@ package com.shopping.helper
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.JWTVerifier
-import com.auth0.jwt.algorithms.Algorithm
 import com.shopping.domain.model.valueObject.ID
 import com.shopping.toDate
 import java.time.LocalDateTime
 import java.util.*
+import com.auth0.jwt.algorithms.Algorithm as JWTAlgorithm
 
 class JWTHelper {
 
     companion object {
 
-        private val SECRET = System.getenv("JWT_SECRET") ?: "SECRET"
+        private val Secret = System.getenv("JWTSecret") ?: "Secret"
 
-        val ISSUER: String = System.getenv("JWT_ISSUER") ?: "ISSUER"
+        val Issuer: String = System.getenv("JWTIssuer") ?: "Issuer"
 
-        val AUDIENCE: String = System.getenv("JWT_AUDIENCE") ?: "AUDIENCE"
+        val Audience: String = System.getenv("JWTAudience") ?: "Audience"
 
-        val ALGORITHM: Algorithm = Algorithm.HMAC256(SECRET)
+        val Algorithm: JWTAlgorithm = JWTAlgorithm.HMAC256(Secret)
 
-        val VERIFIER: JWTVerifier = JWT.require(ALGORITHM)
-            .withIssuer(ISSUER)
-            .withAudience(AUDIENCE)
+        val Verifier: JWTVerifier = JWT.require(Algorithm)
+            .withIssuer(Issuer)
+            .withAudience(Audience)
             .build()
     }
 
@@ -39,9 +39,9 @@ class JWTHelper {
         .withExpiresAt(expiresAt?.toDate())
         .withNotBefore(notBefore?.toDate())
         .withClaims(claims)
-        .withIssuer(ISSUER)
-        .withAudience(AUDIENCE)
-        .sign(ALGORITHM)
+        .withIssuer(Issuer)
+        .withAudience(Audience)
+        .sign(Algorithm)
 }
 
 private fun JWTCreator.Builder.withClaims(claims: Map<String, Any>): JWTCreator.Builder {
