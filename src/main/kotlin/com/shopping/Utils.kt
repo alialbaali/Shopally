@@ -3,10 +3,13 @@ package com.shopping
 import com.auth0.jwt.interfaces.Payload
 import com.cloudinary.Cloudinary
 import com.cloudinary.Configuration
+import com.shopping.domain.model.valueObject.Email
+import com.shopping.domain.model.valueObject.ID
+import com.shopping.domain.model.valueObject.Password
+import com.shopping.domain.model.valueObject.Rating
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
-import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.util.*
@@ -19,7 +22,6 @@ import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-@KtorExperimentalAPI
 fun String.hash(): String {
     val secret = System.getenv("SECRET") ?: "4894"
     val hashKey = hex(secret)
@@ -29,17 +31,39 @@ fun String.hash(): String {
     return hex(hmac.doFinal(this.toByteArray(Charsets.UTF_8)))
 }
 
+fun String.asID(): ID = ID.from(this)
+    .getOrElse { badRequestError(it.message) }
+
+fun String.asEmail(): Email = Email.create(this)
+    .getOrElse { badRequestError(it.message) }
+
+fun String.asPassword(): Password = Password.create(this, String::hash)
+    .getOrElse { badRequestError("${it.message} ${Errors.PasswordValidation}") }
+
+fun Int.asRating(): Rating = Rating.values()
+    .find { it.ordinal.plus(1) == this } ?: badRequestError(Errors.RatingValidation)
+
 fun Date.toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(this.toInstant(), ZoneId.systemDefault())
 
 fun LocalDateTime.toDate(): Date = Date.from(this.atZone(ZoneId.systemDefault()).toInstant())
 
 inline val PipelineContext<*, ApplicationCall>.jwtPayload: Payload
-    get() = call.principal<JWTPrincipal>()?.payload ?: throw BadRequestException(Errors.INVALID_REQUEST)
+    get() = call.principal<JWTPrincipal>()?.payload ?: badRequestError(Errors.InvalidRequest)
 
 inline val PipelineContext<*, ApplicationCall>.customerId: String
-    get() = jwtPayload.subject ?: throw AuthorizationError("Missing ID")
+    get() = jwtPayload.subject ?: authorizationError(Errors.InvalidToken)
 
-inline val PartData.FileItem.size get() = contentDisposition?.parameter(ContentDisposition.Parameters.Size)
+inline val PipelineContext<*, ApplicationCall>.productId: String
+    get() = parameters["product-id"] ?: badRequestError(Errors.ProductIdMissing)
+
+inline val PartData.FileItem.size: String?
+    get() = contentDisposition?.parameter(ContentDisposition.Parameters.Size)
+
+inline val PipelineContext<*, ApplicationCall>.queryParameters: Parameters
+    get() = call.request.queryParameters
+
+inline val PipelineContext<*, ApplicationCall>.parameters: Parameters
+    get() = call.parameters
 
 fun cloudinary(configuration: Configuration.() -> Unit): Cloudinary = Cloudinary().apply {
     config.apply(configuration)

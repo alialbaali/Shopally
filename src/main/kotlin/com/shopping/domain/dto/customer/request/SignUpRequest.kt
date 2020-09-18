@@ -1,24 +1,22 @@
-package com.shopping.domain.dto.customer
+package com.shopping.domain.dto.customer.request
 
-import com.shopping.AuthenticationError
 import com.shopping.Errors
+import com.shopping.asEmail
+import com.shopping.asPassword
+import com.shopping.authenticationError
 import com.shopping.domain.model.valueObject.Email
 import com.shopping.domain.model.valueObject.Password
-import com.shopping.hash
 
 class SignUpRequest(
-    val name: String,
-    val email: String,
-    val password: String
+    val name: String?,
+    val email: String?,
+    val password: String?
 ) {
+    operator fun component1(): String = name?.let {
+        name.takeIf { name.isNotBlank() } ?: authenticationError("Name ${Errors.PropertyEmpty}")
+    } ?: authenticationError("Name ${Errors.PropertyMissing}")
 
-    operator fun component1(): String = if (name.isNotBlank()) name else throw AuthenticationError(Errors.INVALID_NAME)
+    operator fun component2(): Email = email?.asEmail() ?: authenticationError("Email ${Errors.PropertyMissing}")
 
-    operator fun component2(): Email = Email.create(email).getOrElse {
-        throw AuthenticationError(it.message)
-    }
-
-    operator fun component3(): Password = Password.create(password) { hash() }.getOrElse {
-        throw AuthenticationError("${it.message}; ${Errors.PASSWORD_VALIDATION}")
-    }
+    operator fun component3(): Password = password?.asPassword() ?: authenticationError("Password ${Errors.PropertyMissing}")
 }

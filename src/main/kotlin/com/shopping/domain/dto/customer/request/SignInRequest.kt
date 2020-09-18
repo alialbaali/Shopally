@@ -1,20 +1,17 @@
-package com.shopping.domain.dto.customer
+package com.shopping.domain.dto.customer.request
 
-import com.shopping.AuthenticationError
+import com.shopping.Errors
+import com.shopping.asEmail
+import com.shopping.asPassword
+import com.shopping.authenticationError
 import com.shopping.domain.model.valueObject.Email
 import com.shopping.domain.model.valueObject.Password
-import com.shopping.hash
 
 class SignInRequest(
-    val email: String,
-    val password: String
+    val email: String?,
+    val password: String?,
 ) {
+    operator fun component1(): Email = email?.asEmail() ?: authenticationError("Email ${Errors.PropertyMissing}")
 
-    operator fun component1(): Email = Email.create(email).getOrElse {
-        throw AuthenticationError(it.message)
-    }
-
-    operator fun component2(): Password = Password.create(password) { hash() }.getOrElse {
-        throw AuthenticationError(it.message)
-    }
+    operator fun component2(): Password = password?.asPassword() ?: authenticationError("Password ${Errors.PropertyMissing}")
 }
