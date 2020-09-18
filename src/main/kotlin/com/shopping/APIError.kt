@@ -41,6 +41,7 @@ object Errors {
     const val PropertyEmpty = "property can't be empty"
     const val PropertyMissing = "property can't be missing"
     const val RatingValidation = "Rating property must be between 1 and 5"
+    const val ImageFormatValidation = "Unsupported Format"
     const val InvalidName = "Invalid name. Please provide a valid name!"
     const val InvalidCredentials = "Invalid credentials. Please provide valid credentials"
     const val ProductIdMissing = "Product Id can't be missing"
