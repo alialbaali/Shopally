@@ -24,7 +24,7 @@ class JWTHelperTest : DefaultSpec(helperModule) {
 
                     val token = jwtHelper.generateToken(id)
 
-                    val decodedJwt = JWTHelper.VERIFIER.verify(token)
+                    val decodedJwt = JWTHelper.Verifier.verify(token)
 
                     val subject = decodedJwt.subject
 
@@ -45,7 +45,7 @@ class JWTHelperTest : DefaultSpec(helperModule) {
 
                     val token = jwtHelper.generateToken(id, issuedAt, expiresAt, notBefore)
 
-                    val decodedJwt = JWTHelper.VERIFIER.verify(token)
+                    val decodedJwt = JWTHelper.Verifier.verify(token)
 
                     val decodedJwtIssuedAt = decodedJwt.issuedAt
                     val decodedJwtExpiresAt = decodedJwt.expiresAt
@@ -78,7 +78,7 @@ class JWTHelperTest : DefaultSpec(helperModule) {
 
                         val token = jwtHelper.generateToken(id, claims = claims)
 
-                        val decodedJwt = JWTHelper.VERIFIER.verify(token)
+                        val decodedJwt = JWTHelper.Verifier.verify(token)
 
                         val decodedJwtClaims = decodedJwt.claims
 

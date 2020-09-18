@@ -1,8 +1,8 @@
 package com.shopping.domain.model.valueObject
 
-import com.shopping.AuthorizationError
 import com.shopping.DefaultSpec
-import io.kotest.assertions.throwables.shouldThrowExactly
+import com.shopping.asID
+import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 
@@ -30,7 +30,7 @@ class IDTest : DefaultSpec() {
 
                     val id = "12034-3242-234203-423423"
 
-                    shouldThrowExactly<AuthorizationError> {
+                    shouldThrowAny {
                         id.asID()
                     }
                 }

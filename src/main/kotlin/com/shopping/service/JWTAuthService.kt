@@ -1,12 +1,12 @@
 package com.shopping.service
 
 import com.shopping.Errors
+import com.shopping.asID
 import com.shopping.authenticationError
 import com.shopping.domain.dto.customer.request.SignInRequest
 import com.shopping.domain.dto.customer.request.SignUpRequest
 import com.shopping.domain.dto.customer.response.TokenResponse
 import com.shopping.domain.model.Customer
-import com.shopping.domain.model.valueObject.asID
 import com.shopping.domain.repository.CustomerRepository
 import com.shopping.domain.service.AuthService
 import com.shopping.helper.JWTHelper

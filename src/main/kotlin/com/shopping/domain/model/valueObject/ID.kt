@@ -1,6 +1,5 @@
 package com.shopping.domain.model.valueObject
 
-import com.shopping.AuthorizationError
 import com.shopping.Errors
 import java.util.*
 
@@ -20,8 +19,4 @@ inline class ID(private val value: String) {
     }
 
     override fun toString(): String = value
-}
-
-fun String.asID(): ID = ID.from(this).getOrElse {
-    throw AuthorizationError(it.message)
 }

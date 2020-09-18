@@ -38,12 +38,18 @@ private class InternalServerError(message: String?) : APIError(message) {
 
 object Errors {
 
+    const val PropertyEmpty = "property can't be empty"
+    const val PropertyMissing = "property can't be missing"
+    const val RatingValidation = "Rating property must be between 1 and 5"
     const val InvalidName = "Invalid name. Please provide a valid name!"
     const val InvalidCredentials = "Invalid credentials. Please provide valid credentials"
+    const val ProductIdMissing = "Product Id can't be missing"
     const val InvalidRequest = "Invalid request"
-    const val InvalidToken = "Invalid token. Please provide a valid token; if you don't have one, you can get by signing up though /auth/new"
+    const val InvalidToken =
+        "Invalid token. Please provide a valid token; if you don't have one, you can get by signing up though /auth/new"
     const val InvalidEmail = "Invalid Email address. Please provide a valid email address"
-    const val InvalidPassword = "Invalid password. Please provide a valid password; password must contain at least 8 characters and 1 number"
+    const val InvalidPassword =
+        "Invalid password. Please provide a valid password; password must contain at least 8 characters and 1 number"
     const val PasswordValidation = "Password must contain at least 8 characters and one number"
     const val InvalidId = "Invalid ID"
     const val SomethingWentWrong = "Something went wrong!"
@@ -51,6 +57,7 @@ object Errors {
     const val UsedEmail = "Email not available"
     const val ProductDoesntExist = "Product doesn't exist"
     const val CartItemDoesntExist = "Cart item doesn't exist"
+    const val CartItemAlreadyExist = "Cart item Already exist"
     const val AddressDoesntExist = "Address doesn't exist"
     const val CardDoesntExist = "Card doesn't exist"
     const val OrderDoesntExist = "Order doesn't exist"

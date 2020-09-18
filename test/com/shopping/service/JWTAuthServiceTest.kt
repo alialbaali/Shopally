@@ -1,11 +1,12 @@
 package com.shopping.service
 
 import com.shopping.*
-import com.shopping.domain.dto.customer.SignInRequest
-import com.shopping.domain.dto.customer.SignUpRequest
+import com.shopping.domain.dto.customer.request.SignInRequest
+import com.shopping.domain.dto.customer.request.SignUpRequest
 import com.shopping.domain.model.valueObject.ID
 import com.shopping.domain.service.AuthService
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.string.shouldNotBeEmpty
@@ -107,7 +108,7 @@ class JWTAuthServiceTest : DefaultSpec(testServiceModule, helperModule, fakeRepo
 
                     authService.signUp(signUpRequest)
 
-                    shouldThrowExactly<AuthenticationError> {
+                    shouldThrowAny {
                         authService.signUp(signUpRequest)
                     }
                 }
@@ -123,7 +124,7 @@ class JWTAuthServiceTest : DefaultSpec(testServiceModule, helperModule, fakeRepo
                         "password0"
                     )
 
-                    shouldThrowExactly<AuthenticationError> {
+                    shouldThrowAny {
                         authService.signIn(signInRequest)
                     }
                 }
@@ -151,7 +152,7 @@ class JWTAuthServiceTest : DefaultSpec(testServiceModule, helperModule, fakeRepo
 
                     val id = "3232-43209423-43242-3223"
 
-                    shouldThrowExactly<AuthorizationError> {
+                    shouldThrowAny {
                         authService.refreshToken(id)
                     }
                 }
