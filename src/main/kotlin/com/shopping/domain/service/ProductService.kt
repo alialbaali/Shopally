@@ -1,6 +1,8 @@
 package com.shopping.domain.service
 
-import com.shopping.domain.dto.product.request.ReviewRequest
+import com.shopping.domain.dto.product.request.CreateReviewRequest
+import com.shopping.domain.dto.product.request.UpdateReviewRequest
+import com.shopping.domain.dto.product.response.DeleteReviewResponse
 import com.shopping.domain.dto.product.response.ProductDetailsResponse
 import com.shopping.domain.dto.product.response.ProductResponse
 import com.shopping.domain.dto.product.response.ReviewResponse
@@ -15,5 +17,9 @@ interface ProductService {
 
     suspend fun getReview(productId: String, customerId: String): ReviewResponse
 
-    suspend fun createReview(productId: String, customerId: String, reviewRequest: ReviewRequest): ReviewResponse
+    suspend fun createReview(productId: String, customerId: String, createReviewRequest: CreateReviewRequest): ReviewResponse
+
+    suspend fun updateReview(productId: String, customerId: String, updateReviewRequest: UpdateReviewRequest): ReviewResponse
+
+    suspend fun deleteReview(productId: String, customerId: String): DeleteReviewResponse
 }
