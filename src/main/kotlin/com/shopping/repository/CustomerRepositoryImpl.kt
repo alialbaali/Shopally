@@ -1,186 +1,325 @@
 package com.shopping.repository
 
 import com.shopping.Errors
-import com.shopping.db.AddressesQueries
-import com.shopping.db.CardsQueries
-import com.shopping.db.CustomersQueries
+import com.shopping.db.*
+import com.shopping.domain.CloudDataSource
+import com.shopping.domain.StripeCard
+import com.shopping.domain.StripeCardDataSource
+import com.shopping.domain.StripeCustomerDataSource
 import com.shopping.domain.model.Customer
-import com.shopping.domain.model.valueObject.Address
-import com.shopping.domain.model.valueObject.Card
-import com.shopping.domain.model.valueObject.Email
-import com.shopping.domain.model.valueObject.ID
+import com.shopping.domain.model.Order
+import com.shopping.domain.model.valueObject.*
 import com.shopping.domain.repository.CustomerRepository
+import java.io.File
+import java.time.LocalDate
 
-private const val ERROR_NOT_EXIST = "Customer doesn't exist"
-private const val ERROR_EXIST = "Customer exists"
+private const val CustomersFolder = "Customers"
 
 class CustomerRepositoryImpl(
     private val customersQueries: CustomersQueries,
-    private val addressesQueries: AddressesQueries,
-    private val cardsQueries: CardsQueries
+    private val customerCartQueries: CustomerCartQueries,
+    private val customerAddressesQueries: CustomerAddressesQueries,
+    private val customerCardsQueries: CustomerCardsQueries,
+    private val stripeCustomerDao: StripeCustomerDataSource,
+    private val stripeCardDao: StripeCardDataSource,
+    private val cloudDataSource: CloudDataSource,
 ) : CustomerRepository {
 
     override suspend fun getCustomerById(customerId: ID): Result<Customer> {
-
-        val customer = customersQueries.getCustomerById(customerId) { id, name, email, password, image, creation_date ->
-
-            Customer(id, name, email, password, image, creationDate = creation_date)
-
-        }.executeAsOneOrNull() ?: return Result.failure(Throwable(Errors.INVALID_ID))
-
-        return Result.success(customer)
+        return customersQueries.getCustomerById(customerId)
+            .executeAsOneOrNull()
+            ?.toCustomer()
+            ?.let { customer -> Result.success(customer) }
+            ?: return Result.failure(Throwable(Errors.CustomerDoesntExist))
     }
 
     override suspend fun getCustomerByEmail(customerEmail: Email): Result<Customer> {
-
-        val customer =
-            customersQueries.getCustomerByEmail(customerEmail) { id, name, email, password, image, creation_date ->
-
-                Customer(id, name, email, password, image, creationDate = creation_date)
-
-            }.executeAsOneOrNull() ?: return Result.failure(Throwable(ERROR_NOT_EXIST))
-
-        return Result.success(customer)
+        return customersQueries.getCustomerByEmail(customerEmail)
+            .executeAsOneOrNull()
+            ?.toCustomer()
+            ?.let { customer -> Result.success(customer) }
+            ?: return Result.failure(Throwable(Errors.CustomerDoesntExist))
     }
 
-    override suspend fun createCustomer(customer: Customer): Result<Unit> {
+    override suspend fun createCustomer(customer: Customer): Result<Customer> {
 
-        customersQueries.getCustomerByEmail(customer.email).executeAsOneOrNull() ?: run {
+        val (id, name, email, password, imageUrl, _, _, _, creationDate) = customer
 
-            customersQueries.createCustomer(
-                customer.id,
-                customer.name,
-                customer.email,
-                customer.password,
-                customer.image,
-                customer.creationDate
-            )
+        val stripeCustomer = stripeCustomerDao.createStripeCustomer(name, email.toString())
+            .getOrElse {
+                return Result.failure(Throwable(Errors.SomethingWentWrong))
+            }
 
-            return Result.success(Unit)
+        runCatching {
+            customersQueries.createCustomer(id, stripeCustomer.id, name, email, password, imageUrl, creationDate)
+        }.getOrElse {
+
+            stripeCustomerDao.deleteStripeCustomerById(stripeCustomer.id)
+                .getOrThrow()
+
+            return Result.failure(Throwable(Errors.SomethingWentWrong))
         }
 
-        return Result.failure(Throwable(ERROR_EXIST))
+        return getCustomerById(id)
     }
 
-    override suspend fun updateCustomer(customer: Customer): Result<Unit> {
+    override suspend fun updateCustomer(customer: Customer): Result<Customer> {
 
-        customersQueries.getCustomerById(customer.id).executeAsOneOrNull()
-            ?: return Result.failure(Throwable(ERROR_NOT_EXIST))
+        val (id, name, email, password, imageUrl) = customer
 
-        customersQueries.updateCustomer(customer.name, customer.email, customer.password, customer.image, customer.id)
+        val dbCustomer = customersQueries.getCustomerById(customer.id)
+            .executeAsOneOrNull() ?: return Result.failure(Throwable(Errors.CustomerDoesntExist))
 
-        return Result.success(Unit)
-    }
+        stripeCustomerDao.updateStripeCustomerById(dbCustomer.stripe_id, name, email.toString())
+            .getOrElse {
+                return Result.failure(Throwable(Errors.SomethingWentWrong))
+            }
 
-    override suspend fun deleteCustomerById(customerId: ID): Result<Unit> {
+        runCatching {
 
-        customersQueries.getCustomerById(customerId).executeAsOneOrNull()
-            ?: return Result.failure(Throwable(ERROR_NOT_EXIST))
-
-        customersQueries.deleteCustomer(customerId)
-
-        return Result.success(Unit)
-    }
-
-    override suspend fun getAddressesByCustomerId(customerId: ID): Result<List<Address>> {
-
-        val addresses =
-            addressesQueries.getAddressesByCustomerID(customerId) { _, name, country, city, address_line, zip_code ->
-
-                Address(name, country, city, address_line, zip_code)
-
-            }.executeAsList()
-
-        return Result.success(addresses)
-    }
-
-
-    override suspend fun createAddressByCustomerId(customerId: ID, address: Address): Result<Unit> {
-
-        val addresses =
-            addressesQueries.getAddressesByCustomerID(customerId) { _, name, country, city, address_line, zip_code ->
-
-                Address(name, country, city, address_line, zip_code)
-
-            }.executeAsList()
-
-        return if (addresses.any { it == address })
-
-            Result.failure(Throwable(ERROR_EXIST))
-
-        else {
-
-            addressesQueries.createAddress(
-                customerId,
-                address.name,
-                address.country,
-                address.city,
-                address.line,
-                address.zipCode
+            customersQueries.updateCustomerById(
+                name,
+                email,
+                password,
+                imageUrl,
+                id,
             )
+        }.onFailure {
 
-            Result.success(Unit)
+            customersQueries.getCustomerById(id)
+                .executeAsOne()
+                .apply {
+                    stripeCustomerDao.updateStripeCustomerById(stripe_id, name, email.toString())
+                        .getOrElse {
+                            return Result.failure(Throwable(Errors.SomethingWentWrong))
+                        }
+                }
+
+            return Result.failure(Throwable(Errors.SomethingWentWrong))
         }
+
+        return getCustomerById(id)
+    }
+
+    override suspend fun updateCustomerImage(customerId: ID, customerImageFile: File): Result<String> {
+
+        val imageUrl = cloudDataSource.uploadImage(
+            customerImageFile,
+            imageId = customerId.toString(),
+            folderName = CustomersFolder
+        ).getOrElse {
+            return Result.failure(Throwable(Errors.ImageUploadFailed))
+        }
+
+        val customer = customersQueries.getCustomerById(customerId)
+            .executeAsOne().toCustomer()
+
+        updateCustomer(customer.copy(imageUrl = imageUrl))
+            .getOrElse {
+                return Result.failure(Throwable(Errors.SomethingWentWrong))
+            }
+
+        return Result.success(imageUrl)
+    }
+
+    override suspend fun deleteCustomerById(customerId: ID): Result<ID> {
+
+        val stripeCustomerId = customersQueries.getCustomerById(customerId)
+            .executeAsOneOrNull()
+            ?.stripe_id ?: return Result.failure(Throwable(Errors.CustomerDoesntExist))
+
+        stripeCustomerDao.deleteStripeCustomerById(stripeCustomerId)
+            .getOrElse {
+                return Result.failure(Throwable(Errors.SomethingWentWrong))
+            }
+
+        return customersQueries.transactionWithResult {
+
+            customersQueries.deleteCustomerById(customerId)
+
+            customerAddressesQueries.deleteAddressesByCustomerId(customerId)
+
+            customerCardsQueries.deleteCardsByCustomerId(customerId)
+
+            customerCartQueries.deleteCartItemsByCustomerId(customerId)
+
+            Result.success(customerId)
+        }
+    }
+
+    override suspend fun getCartByCustomerId(customerId: ID): Result<Cart> {
+        return customerCartQueries.getCartItemsByCustomerId(customerId)
+            .executeAsList()
+            .map { it.toCartItem() }
+            .toSet()
+            .let { Result.success(Cart(it)) }
+    }
+
+    override suspend fun getCartItem(customerId: ID, productID: ID): Result<CartItem> {
+        return customerCartQueries.getCartItem(customerId, productID)
+            .executeAsOneOrNull()
+            ?.toCartItem()
+            ?.let { Result.success(it) } ?: return Result.failure(Throwable(Errors.CartItemDoesntExist))
+    }
+
+    override suspend fun createCartItem(customerId: ID, cartItem: CartItem): Result<CartItem> {
+        val (productId, quantity) = cartItem
+
+        return customerCartQueries.createCartItem(customerId, productId, quantity)
+            .run { getCartItem(customerId, productId) }
+    }
+
+    override suspend fun updateCartItem(customerId: ID, cartItem: CartItem): Result<Order.OrderItem> {
+        val (productId, quantity) = cartItem
+
+        return customerCartQueries.updateCartItem(quantity, customerId, productId)
+            .run { getCartItem(customerId, productId) }
+    }
+
+    override suspend fun deleteCartItem(customerId: ID, productId: ID): Result<ID> {
+        return customerCartQueries.deleteCartItem(customerId, productId)
+            .run { Result.success(productId) }
+    }
+
+    override suspend fun deleteCartItemsByCustomerId(customerId: ID): Result<ID> {
+        return customerCartQueries.deleteCartItemsByCustomerId(customerId)
+            .let { Result.success(customerId) }
+    }
+
+    override suspend fun getAddressesByCustomerId(customerId: ID): Result<Set<Address>> {
+        return customerAddressesQueries.getAddressesByCustomerId(customerId)
+            .executeAsList()
+            .map { dbAddress -> dbAddress.toAddress() }
+            .toSet()
+            .let { Result.success(it) }
+    }
+
+    override suspend fun getAddress(customerId: ID, addressName: String): Result<Address> {
+        return customerAddressesQueries.getAddress(customerId, addressName)
+            .executeAsOneOrNull()
+            ?.toAddress()
+            ?.let { Result.success(it) } ?: return Result.failure(Throwable(Errors.AddressDoesntExist))
+    }
+
+    override suspend fun createAddress(customerId: ID, address: Address): Result<Address> {
+        val (name, country, city, line, zipCode) = address
+
+        return customerAddressesQueries.createAddress(customerId, name, country, city, line, zipCode)
+            .run { getAddress(customerId, address.name) }
+    }
+
+    override suspend fun deleteAddress(customerId: ID, addressName: String): Result<String> {
+        return customerAddressesQueries.deleteAddress(customerId, addressName)
+            .run { Result.success(addressName) }
     }
 
     override suspend fun countAddressesByCustomerId(customerId: ID): Result<Long> {
-
-        val addressCount =
-            addressesQueries.countAddressesByCustomerId(customerId).executeAsOneOrNull()
-                ?: return Result.failure(Throwable(Errors.INVALID_ID))
-
-        return Result.success(addressCount)
+        return customerAddressesQueries.countAddressesByCustomerId(customerId)
+            .executeAsOne()
+            .let { Result.success(it) }
     }
 
-    override suspend fun getCardsByCustomerId(customerId: ID): Result<List<Card>> {
+    override suspend fun getCardsByCustomerId(customerId: ID): Result<Set<Card>> {
 
-        val cards =
-            cardsQueries.getCardsByCustomerId(customerId) { _, name, brand, number, balance, ccv, expiration_date ->
+        val stripeCustomerId = customersQueries.getCustomerById(customerId) { _, stripe_id, _, _, _, _, _ -> stripe_id }
+            .executeAsOneOrNull() ?: return Result.failure(Throwable(Errors.CustomerDoesntExist))
 
-                Card(name, brand, number, balance, ccv, expiration_date)
-
-            }.executeAsList()
+        val cards = stripeCardDao.getStripeCardsByCustomerId(stripeCustomerId)
+            .getOrElse { return Result.failure(Throwable(Errors.SomethingWentWrong)) }
+            .map { stripeCard -> stripeCard.toCard() }
+            .toSet()
 
         return Result.success(cards)
     }
 
-    override suspend fun createCardByCustomerId(customerId: ID, card: Card): Result<Unit> {
+    override suspend fun getCard(customerId: ID, cardLast4Numbers: Long): Result<Card> {
 
-        val cards =
+        val stripeCustomerId = customersQueries.getCustomerById(customerId) { _, stripe_id, _, _, _, _, _ -> stripe_id }
+            .executeAsOneOrNull() ?: return Result.failure(Throwable(Errors.CustomerDoesntExist))
 
-            cardsQueries.getCardsByCustomerId(customerId) { _, name, brand, number, balance, ccv, expiration_date ->
+        val stripeCardId = customerCardsQueries.getCard(customerId, cardLast4Numbers)
+            .executeAsOneOrNull()
+            ?.stripe_card_id ?: return Result.failure(Throwable(Errors.CardDoesntExist))
 
-                Card(name, brand, number, balance, ccv, expiration_date)
+        return stripeCardDao.getStripeCardById(stripeCustomerId, stripeCardId)
+            .getOrElse { return Result.failure(Throwable(Errors.CardDoesntExist)) }
+            .toCard()
+            .let { Result.success(it) }
+    }
 
-            }.executeAsList()
+    override suspend fun createCard(customerId: ID, card: Card): Result<Card> {
 
-        return if (cards.any { it == card })
+        val (_, number, expirationDate, cvc) = card
 
-            Result.failure(Throwable(ERROR_EXIST))
+        val expMonth = expirationDate.monthValue
+        val expYear = expirationDate.year
 
-        else {
+        val stripeCustomerId = customersQueries.getCustomerById(customerId)
+            .executeAsOneOrNull()
+            ?.stripe_id ?: return Result.failure(Throwable(Errors.CustomerDoesntExist))
 
-            cardsQueries.createCard(
+        val stripeCard = stripeCardDao.createStripeCard(
+            stripeCustomerId,
+            number.toString(),
+            expMonth,
+            expYear,
+            cvc
+        ).getOrElse { return Result.failure(Throwable(it.message)) }
+
+        runCatching {
+            customerCardsQueries.createCard(
                 customerId,
-                card.name,
-                card.brand,
-                card.number,
-                card.balance,
-                card.ccv,
-                card.expirationDate
+                stripeCard.id,
+                stripeCard.last4.toLong()
             )
+        }.getOrElse {
 
-            Result.success(Unit)
+            stripeCardDao.deleteStripeCard(stripeCustomerId, stripeCard.id)
+
+            return Result.failure(Throwable(Errors.SomethingWentWrong))
         }
+
+        return Result.success(stripeCard.toCard())
+    }
+
+    override suspend fun deleteCard(customerId: ID, cardLast4Numbers: Long): Result<Long> {
+
+        val dbCard = customerCardsQueries.getCard(customerId, cardLast4Numbers)
+            .executeAsOneOrNull() ?: return Result.failure(Throwable(Errors.CardDoesntExist))
+
+        val dbCustomer = customersQueries.getCustomerById(customerId)
+            .executeAsOneOrNull() ?: return Result.failure(Throwable(Errors.CustomerDoesntExist))
+
+        return stripeCardDao.deleteStripeCard(dbCustomer.stripe_id, dbCard.stripe_card_id)
+            .fold(
+                onSuccess = {
+                    customerCardsQueries.deleteCard(customerId, dbCard.stripe_card_id)
+                    Result.success(cardLast4Numbers)
+                },
+                onFailure = { return Result.failure(Throwable(Errors.SomethingWentWrong)) },
+            )
     }
 
     override suspend fun countCardsByCustomerId(customerId: ID): Result<Long> {
-
-        val cardsCount =
-            cardsQueries.countCardsByCustomerId(customerId).executeAsOneOrNull()
-                ?: return Result.failure(Throwable(Errors.INVALID_ID))
-
-        return Result.success(cardsCount)
+        return customerCardsQueries.countCardsByCustomerId(customerId)
+            .executeAsOne()
+            .let { Result.success(it) }
     }
+}
 
+private fun Customers.toCustomer(): Customer {
+    return Customer(id, name, email, password, image_url, creationDate = creation_date)
+}
+
+private fun CustomerAddresses.toAddress(): Address {
+    return Address(name, country, city, line, zip_code)
+}
+
+private fun StripeCard.toCard(): Card {
+    val expirationDate = LocalDate.of(expYear.toInt(), expMonth.toInt(), 1)
+    return Card(brand, last4.toLong(), expirationDate)
+}
+
+private fun CustomerCart.toCartItem(): CartItem {
+    return CartItem(product_id, quantity)
 }

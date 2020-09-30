@@ -26,7 +26,7 @@ interface CustomerRepository {
 
     suspend fun updateCartItem(customerId: ID, cartItem: CartItem): Result<CartItem>
 
-    suspend fun deleteCartItem(customerId: ID, productId: ID): Result<Pair<ID, ID>>
+    suspend fun deleteCartItem(customerId: ID, productId: ID): Result<ID>
 
     suspend fun deleteCartItemsByCustomerId(customerId: ID): Result<ID>
 
