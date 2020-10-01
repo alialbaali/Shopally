@@ -25,18 +25,18 @@ interface CustomerService {
 
     suspend fun updateCartItem(customerId: String, updateCartItemRequest: UpdateCartItemRequest): CartItemResponse
 
-    suspend fun deleteCartItem(customerId: String, productId: String)
+    suspend fun deleteCartItem(customerId: String, productId: String): String
 
     suspend fun getAddressesByCustomerId(customerId: String): Set<AddressResponse>
 
     suspend fun createAddressByCustomerId(customerId: String, createAddressRequest: CreateAddressRequest): AddressResponse
 
-    suspend fun deleteAddressByName(customerId: String, addressName: String)
+    suspend fun deleteAddressByName(customerId: String, addressName: String) : String
 
     suspend fun getCardsByCustomerId(customerId: String): Set<CardResponse>
 
     suspend fun createCardByCustomerId(customerId: String, createCardRequest: CreateCardRequest): CardResponse
 
-    suspend fun deleteCartByLast4(customerId: String, cardLast4Numbers: Long)
+    suspend fun deleteCartByLast4(customerId: String, cardLast4Numbers: Long): Long
 
 }
