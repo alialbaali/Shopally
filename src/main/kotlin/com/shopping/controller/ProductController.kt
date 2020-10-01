@@ -26,7 +26,7 @@ fun Routing.product(productService: ProductService) {
 
             val products = productService.getProducts(limit, offset)
 
-            call.respond(HttpStatusCode.OK, products)
+            call.respond(HttpStatusCode.OK, mapOf("products" to products))
         }
 
         route("/{product-id}") {
@@ -44,7 +44,7 @@ fun Routing.product(productService: ProductService) {
 
                     val reviews = productService.getReviewsByProductId(productId)
 
-                    call.respond(HttpStatusCode.OK, reviews)
+                    call.respond(HttpStatusCode.OK, mapOf("reviews" to reviews))
                 }
 
                 authenticate {

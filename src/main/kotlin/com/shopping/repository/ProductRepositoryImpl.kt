@@ -22,6 +22,20 @@ class ProductRepositoryImpl(
 
     override suspend fun getProducts(limit: Long, offset: Long): Result<List<Product>> {
 
+        repeat(10) {
+            val product = Product(
+                name = it.toString(),
+                brand = it.toString(),
+                category = Product.Category.values().random(),
+                description = it.toString(),
+                price = it.times(it.toDouble()),
+                imagesUrls = setOf(it.toString()),
+                releaseDate = LocalDate.now().plusYears((2000..3000L).random()),
+            )
+
+            createProduct(product, emptyList()).getOrNull()
+        }
+
         val products = productsQueries.getProducts(limit, offset)
             .executeAsList()
             .map { dbProduct ->

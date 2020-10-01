@@ -43,5 +43,4 @@ class StripeCustomerDao : StripeCustomerDataSource {
         StripeCustomer.retrieve(stripeCustomerId).delete()
         stripeCustomerId
     }
-
 }

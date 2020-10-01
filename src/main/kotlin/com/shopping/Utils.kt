@@ -3,10 +3,7 @@ package com.shopping
 import com.auth0.jwt.interfaces.Payload
 import com.cloudinary.Cloudinary
 import com.cloudinary.Configuration
-import com.shopping.domain.model.valueObject.Email
-import com.shopping.domain.model.valueObject.ID
-import com.shopping.domain.model.valueObject.Password
-import com.shopping.domain.model.valueObject.Rating
+import com.shopping.domain.model.valueObject.*
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -29,6 +26,14 @@ fun String.hash(): String {
     val hmac = Mac.getInstance("HmacSHA1")
     hmac.init(hmacKey)
     return hex(hmac.doFinal(this.toByteArray(Charsets.UTF_8)))
+}
+
+val Card.last4Numbers
+    get() = this.number.toString().takeLast(4).toLong()
+
+fun PartData.validate() {
+    val isImageContentType = contentType?.match(ContentType.Image.Any) ?: badRequestError(Errors.ImageFormatValidation)
+    if (!isImageContentType) badRequestError(Errors.InvalidRequest)
 }
 
 fun String.asID(): ID = ID.from(this)
@@ -54,7 +59,7 @@ inline val PipelineContext<*, ApplicationCall>.customerId: String
     get() = jwtPayload.subject ?: authorizationError(Errors.InvalidToken)
 
 inline val PipelineContext<*, ApplicationCall>.productId: String
-    get() = parameters["product-id"] ?: badRequestError(Errors.ProductIdMissing)
+    get() = parameters["product-id"] ?: badRequestError(Errors.ProductIdParameterMissing)
 
 inline val PartData.FileItem.size: String?
     get() = contentDisposition?.parameter(ContentDisposition.Parameters.Size)
