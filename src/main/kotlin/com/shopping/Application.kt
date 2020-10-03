@@ -90,7 +90,6 @@ fun Application.module(isTesting: Boolean = false) {
             error.printStackTrace()
             call.respond(HttpStatusCode.InternalServerError, mapOf("error" to error.message))
         }
-
     }
 
     routing {

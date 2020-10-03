@@ -75,7 +75,6 @@ fun Routing.product(productService: ProductService) {
 
                         call.respond(HttpStatusCode.NoContent, deleteReviewResponse)
                     }
-
                 }
             }
         }

@@ -58,7 +58,6 @@ fun Routing.customer(customerService: CustomerService) {
 
                         else -> badRequestError(Errors.ImageFormatValidation)
                     }
-
                 }
             }
 

@@ -190,7 +190,7 @@ class CustomerServiceImpl(private val customerRepository: CustomerRepository) : 
     }
 
     override suspend fun deleteCartByLast4(customerId: String, cardLast4Numbers: Long): Long {
-       return customerRepository.deleteCard(customerId.asID(), cardLast4Numbers)
+        return customerRepository.deleteCard(customerId.asID(), cardLast4Numbers)
             .getOrElse { badRequestError(it.message) }
     }
 

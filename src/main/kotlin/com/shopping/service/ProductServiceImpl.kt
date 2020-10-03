@@ -15,7 +15,6 @@ import com.shopping.domain.repository.ProductRepository
 import com.shopping.domain.service.ProductService
 import org.koin.core.KoinComponent
 import org.koin.core.get
-import java.io.File
 
 private const val PaginationDefaultLimit = 50L
 private const val PaginationDefaultOffset = 0L

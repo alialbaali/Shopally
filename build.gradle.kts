@@ -64,6 +64,7 @@ dependencies {
     implementation(Libs.Koin)
     implementation(Libs.Cloudinary)
     implementation(Libs.Stripe)
+    implementation(Libs.PostgreSql)
 
     testImplementation(Libs.Test.Ktor)
     testImplementation(Libs.Test.SqlDelightDriver)
@@ -100,6 +101,10 @@ kotlin {
 tasks {
     test {
         useJUnitPlatform()
+    }
+    register("stage") {
+        dependsOn("run", "clean")
+        mustRunAfter("clean")
     }
 }
 

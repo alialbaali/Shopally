@@ -4,7 +4,6 @@ import com.shopping.Errors
 import com.shopping.asPassword
 import com.shopping.authenticationError
 import com.shopping.domain.model.valueObject.Password
-import com.shopping.hash
 
 class UpdateCustomerPasswordRequest(
     private val oldPassword: String?,

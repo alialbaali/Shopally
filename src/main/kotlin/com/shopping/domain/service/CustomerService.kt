@@ -31,12 +31,11 @@ interface CustomerService {
 
     suspend fun createAddressByCustomerId(customerId: String, createAddressRequest: CreateAddressRequest): AddressResponse
 
-    suspend fun deleteAddressByName(customerId: String, addressName: String) : String
+    suspend fun deleteAddressByName(customerId: String, addressName: String): String
 
     suspend fun getCardsByCustomerId(customerId: String): Set<CardResponse>
 
     suspend fun createCardByCustomerId(customerId: String, createCardRequest: CreateCardRequest): CardResponse
 
     suspend fun deleteCartByLast4(customerId: String, cardLast4Numbers: Long): Long
-
 }
