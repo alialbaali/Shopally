@@ -305,6 +305,16 @@ class CustomerRepositoryImpl(
             .executeAsOne()
             .let { Result.success(it) }
     }
+
+    override suspend fun chargeCard(customerId: ID, cardLast4Numbers: Long, amount: Double): Result<Unit> {
+        val customer = customersQueries.getCustomerById(customerId)
+            .executeAsOneOrNull() ?: return Result.failure(Throwable(Errors.CustomerDoesntExist))
+
+        val card = customerCardsQueries.getCard(customerId, cardLast4Numbers)
+            .executeAsOneOrNull() ?: return Result.failure(Throwable(Errors.CardDoesntExist))
+
+        return stripeCardDao.chargeCardById(customer.stripe_id, card.stripe_card_id, amount)
+    }
 }
 
 private fun Customers.toCustomer(): Customer {

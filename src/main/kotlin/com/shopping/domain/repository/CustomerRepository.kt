@@ -49,4 +49,6 @@ interface CustomerRepository {
     suspend fun deleteCard(customerId: ID, cardLast4Numbers: Long): Result<Long>
 
     suspend fun countCardsByCustomerId(customerId: ID): Result<Long>
+
+    suspend fun chargeCard(customerId: ID, cardLast4Numbers: Long, amount: Double): Result<Unit>
 }
