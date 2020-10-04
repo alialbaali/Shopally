@@ -64,7 +64,6 @@ dependencies {
     implementation(Libs.Koin)
     implementation(Libs.Cloudinary)
     implementation(Libs.Stripe)
-    implementation(Libs.PostgreSql)
 
     testImplementation(Libs.Test.Ktor)
     testImplementation(Libs.Test.SqlDelightDriver)

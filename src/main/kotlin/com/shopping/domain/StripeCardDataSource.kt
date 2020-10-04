@@ -13,4 +13,6 @@ interface StripeCardDataSource {
     suspend fun createStripeCard(stripeCustomerId: String, number: String, expMonth: Int, expYear: Int, cvc: Long): Result<StripeCard>
 
     suspend fun deleteStripeCard(stripeCustomerId: String, stripeCardId: String): Result<String>
+
+    suspend fun chargeCardById(stripeCustomerId: String, stripeCardId: String, amount: Double): Result<Unit>
 }

@@ -33,8 +33,6 @@ object Versions {
 
     const val Kotest = "4.2.5"
 
-    const val PostgreSql = "42.2.2"
-
 }
 
 object Database {
@@ -63,9 +61,7 @@ object Libs {
 
     const val SqlDelight = "com.squareup.sqldelight:gradle-plugin:${Versions.SqlDelight}"
 
-    const val SqlDelightDriver = "com.squareup.sqldelight:jdbc-driver:${Versions.SqlDelight}"
-
-    const val PostgreSql = "org.postgresql:postgresql:${Versions.PostgreSql}"
+    const val SqlDelightDriver = "com.squareup.sqldelight:sqlite-driver:${Versions.SqlDelight}"
 
     const val Koin = "org.koin:koin-ktor:${Versions.Koin}"
 

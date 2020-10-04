@@ -63,6 +63,7 @@ object Errors {
     const val ProductDoesntExist = "Product doesn't exist"
     const val CartItemDoesntExist = "Cart item doesn't exist"
     const val CartItemAlreadyExist = "Cart item Already exist"
+    const val CartIsEmpty = "Cart is empty"
     const val AddressDoesntExist = "Address doesn't exist"
     const val AddressAlreadyExist = "Address Already Exist"
     const val CardDoesntExist = "Card doesn't exist"

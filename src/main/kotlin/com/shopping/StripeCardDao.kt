@@ -2,7 +2,9 @@ package com.shopping
 
 import com.shopping.domain.StripeCard
 import com.shopping.domain.StripeCardDataSource
+import com.stripe.model.Charge
 import com.stripe.model.Customer
+import com.stripe.param.ChargeCreateParams
 import com.stripe.param.PaymentSourceCollectionCreateParams
 
 private const val StripeNumber = "number"
@@ -12,6 +14,7 @@ private const val StripeCvc = "cvc"
 private const val Source = "source"
 private const val MasterCard = "tok_mastercard"
 private const val Visa = "tok_visa"
+private const val Currency = "USD"
 
 class StripeCardDao : StripeCardDataSource {
 
@@ -45,5 +48,15 @@ class StripeCardDao : StripeCardDataSource {
         val stripeCard = StripeCustomer.retrieve(stripeCustomerId).sources.retrieve(stripeCardId) as StripeCard
         stripeCard.delete()
         stripeCardId
+    }
+
+    override suspend fun chargeCardById(stripeCustomerId: String, stripeCardId: String, amount: Double): Result<Unit> = runCatching {
+        val params = ChargeCreateParams.builder()
+            .setCustomer(stripeCustomerId)
+            .setSource(stripeCardId)
+            .setAmount(amount.toLong())
+            .setCurrency(Currency)
+            .build()
+        Charge.create(params)
     }
 }
