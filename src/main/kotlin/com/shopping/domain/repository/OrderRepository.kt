@@ -12,5 +12,4 @@ interface OrderRepository {
     suspend fun createOrder(order: Order): Result<Order>
 
     suspend fun getOrderItemsByOrderId(orderId: ID): Result<Set<Order.OrderItem>>
-
 }
