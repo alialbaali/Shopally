@@ -17,17 +17,16 @@ import com.shopping.repository.OrderRepositoryImpl
 import com.shopping.repository.ProductRepositoryImpl
 import com.shopping.service.CustomerServiceImpl
 import com.shopping.service.JWTAuthService
-import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import io.mockk.mockk
 import org.koin.dsl.module
 
 val testDBModule = module {
 
-    single<JdbcSqliteDriver>(override = true) {
-        JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY).apply {
-            ShoppingDatabase.Schema.create(this)
-        }
-    }
+//    single<JdbcSqliteDriver>(override = true) {
+//        JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY).apply {
+//            ShoppingDatabase.Schema.create(this)
+//        }
+//    }
 }
 
 val fakeRepositoryModule = module(override = true) {
@@ -37,7 +36,6 @@ val fakeRepositoryModule = module(override = true) {
     single<OrderRepository> { FakeOrderRepository() }
 
     single<ProductRepository> { FakeProductRepository() }
-
 }
 
 val testServiceModule = module(override = true) {
@@ -105,5 +103,4 @@ val mockDataSourceModule = module(override = true) {
     single<StripeCustomerDataSource> { mockk() }
 
     single<StripeCardDataSource> { mockk() }
-
 }

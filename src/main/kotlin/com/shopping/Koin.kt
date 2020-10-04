@@ -20,30 +20,20 @@ import com.shopping.service.CustomerServiceImpl
 import com.shopping.service.JWTAuthService
 import com.shopping.service.OrderServiceImpl
 import com.shopping.service.ProductServiceImpl
-import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.sqlite.driver.asJdbcDriver
+import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import main.sqldelight.com.shopping.db.*
 import org.koin.dsl.module
-import org.postgresql.ds.PGSimpleDataSource
-
-private const val LOCAL_DATABASE_URL = "jdbc:sqlite:identifier.sqlite"
 
 val dbModule = module {
 
-    single<SqlDriver> {
-        PGSimpleDataSource()
-            .apply {
-                user = "postgres"
-                databaseName = "shopping_database"
-                password = "zxcvbnm"
-            }
-            .asJdbcDriver()
-            .apply { initSchema() }
+    single<JdbcSqliteDriver> {
+        JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+            .also { ShoppingDatabase.Schema.create(it) }
     }
 
     factory<ShoppingDatabase> {
         ShoppingDatabase(
-            get<SqlDriver>(),
+            get<JdbcSqliteDriver>(),
             get<CustomerAddresses.Adapter>(),
             get<CustomerCards.Adapter>(),
             get<CustomerCart.Adapter>(),
@@ -130,9 +120,7 @@ val dataSourceModule = module {
     single<ProductReviewsQueries> { get<ShoppingDatabase>().productReviewsQueries }
 
     single<Cloudinary> {
-
         cloudinary {
-
             apiKey = System.getenv("CLOUDINARY_API_KEY") ?: "765587984541786"
             apiSecret = System.getenv("CLOUDINARY_API_SECRET") ?: "glbkGVpN9wwydVZ1iaTlM_BPI3o"
             cloudName = System.getenv("CLOUDINARY_CLOUD_NAME") ?: "shopping-cloud"
@@ -192,139 +180,4 @@ val serviceModule = module {
 val helperModule = module {
 
     single { JWTHelper() }
-}
-
-private fun SqlDriver.initSchema() {
-    execute(
-        null,
-        """
-          |CREATE TABLE IF NOT EXISTS Customers (
-          |  id TEXT NOT NULL PRIMARY KEY,
-          |  stripe_id TEXT NOT NULL UNIQUE,
-          |  name TEXT NOT NULL,
-          |  email TEXT NOT NULL UNIQUE,
-          |  password TEXT NOT NULL,
-          |  image_url TEXT NOT NULL,
-          |  creation_date TEXT NOT NULL
-          |)
-          """.trimMargin(),
-        0
-    )
-    execute(
-        null,
-        """
-          |CREATE TABLE IF NOT EXISTS Products (
-          |id              TEXT          NOT NULL    PRIMARY KEY,
-          |category        TEXT    NOT NULL,
-          |brand           TEXT           NOT NULL,
-          |name            TEXT           NOT NULL,
-          |description     TEXT           NOT NULL,
-          |price           REAL    NOT NULL,
-          |release_date    TEXT   NOT NULL,
-          |creation_date   TEXT   NOT NULL
-          |)
-          """.trimMargin(),
-        0
-    )
-    execute(
-        null,
-        """
-          |CREATE TABLE IF NOT EXISTS CustomerAddresses (
-          |customer_id TEXT NOT NULL REFERENCES Customers(id),
-          |name TEXT NOT NULL,
-          |country TEXT NOT NULL,
-          |city TEXT NOT NULL,
-          |line TEXT NOT NULL,
-          |zip_code TEXT NOT NULL,
-          |UNIQUE(customer_id, name)
-          |)
-          """.trimMargin(),
-        0
-    )
-    execute(
-        null,
-        """
-          |CREATE TABLE IF NOT EXISTS Orders (
-          |id TEXT NOT NULL PRIMARY KEY,
-          |customer_id TEXT REFERENCES Customers(id) NOT NULL,
-          |address_name TEXT NOT NULL,
-          |card_last_4_numbers INTEGER NOT NULL,
-          |creation_date TEXT NOT NULL
-          |)
-          """.trimMargin(),
-        0
-    )
-    execute(
-        null,
-        """
-          |CREATE TABLE IF NOT EXISTS ProductReviews (
-          |product_id TEXT REFERENCES Products(id) NOT NULL,
-          |customer_id TEXT REFERENCES Customers(id) NOT NULL,
-          |rating TEXT NOT NULL,
-          |description TEXT,
-          |creation_date TEXT NOT NULL,
-          |UNIQUE(product_id, customer_id)
-          |)
-          """.trimMargin(),
-        0
-    )
-    execute(
-        null,
-        """
-          |CREATE TABLE IF NOT EXISTS CustomerCards (
-          |customer_id TEXT REFERENCES Customers(id) NOT NULL,
-          |stripe_card_id TEXT NOT NULL,
-          |card_last_4_numbers INTEGER NOT NULL,
-          |UNIQUE(customer_id, stripe_card_id, card_last_4_numbers)
-          |)
-          """.trimMargin(),
-        0
-    )
-    execute(
-        null,
-        """
-          |CREATE TABLE IF NOT EXISTS ProductSpecs (
-          |product_id TEXT REFERENCES Products(id) NOT NULL,
-          |key TEXT NOT NULL,
-          |value TEXT NOT NULL,
-          |UNIQUE(product_id, key, value)
-          |)
-          """.trimMargin(),
-        0
-    )
-    execute(
-        null,
-        """
-          |CREATE TABLE IF NOT EXISTS CustomerCart(
-          |customer_id TEXT REFERENCES Customers(id) NOT NULL,
-          |product_id TEXT REFERENCES Products(id) NOT NULL,
-          |quantity INTEGER NOT NULL,
-          |UNIQUE(customer_id, product_id)
-          |)
-          """.trimMargin(),
-        0
-    )
-    execute(
-        null,
-        """
-          |CREATE TABLE IF NOT EXISTS ProductImages (
-          |product_id TEXT REFERENCES Products(id) NOT NULL,
-          |image_url TEXT NOT NULL UNIQUE,
-          |UNIQUE(product_id, image_url)
-          |)
-          """.trimMargin(),
-        0
-    )
-    execute(
-        null,
-        """
-          |CREATE TABLE IF NOT EXISTS OrderItems (
-          |order_id TEXT REFERENCES Orders(id) NOT NULL,
-          |product_id TEXT REFERENCES Products(id) NOT NULL,
-          |quantity INTEGER NOT NULL,
-          |UNIQUE(order_id, product_id)
-          |)
-          """.trimMargin(),
-        0
-    )
 }
