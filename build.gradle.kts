@@ -102,7 +102,7 @@ tasks {
         useJUnitPlatform()
     }
     register("stage") {
-        dependsOn("run", "clean")
+        dependsOn("assemble", "clean")
         mustRunAfter("clean")
     }
 }
