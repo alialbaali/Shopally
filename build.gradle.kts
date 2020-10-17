@@ -16,6 +16,7 @@ plugins {
     kotlin(Plugins.Kotlin) version Versions.Kotlin
     id(Plugins.SqlDelight) version Versions.SqlDelight
     id(Plugins.KtLint) version Versions.KtLintGradle
+//    id(Plugins.Shadow) version Versions.Shadow
 }
 
 sqldelight {
@@ -102,8 +103,17 @@ tasks {
         useJUnitPlatform()
     }
     register("stage") {
-        dependsOn("assemble", "clean")
+        dependsOn("assemble", "clean", "")
         mustRunAfter("clean")
+    }
+    jar {
+        manifest {
+            attributes(
+                mapOf(
+                    "Main-Class" to application.mainClassName
+                )
+            )
+        }
     }
 }
 
@@ -112,3 +122,4 @@ kotlin.sourceSets["test"].kotlin.srcDirs("test")
 
 sourceSets["main"].resources.srcDirs("resources")
 sourceSets["test"].resources.srcDirs("testresources")
+
