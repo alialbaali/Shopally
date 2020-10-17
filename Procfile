@@ -1,1 +1,1 @@
-web: java -jar build/libs/Shopping-API-1.0.jar
+web: java -jar build/libs/Shopping-API-1.0-all.jar
