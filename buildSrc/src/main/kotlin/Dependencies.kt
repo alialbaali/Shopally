@@ -33,6 +33,8 @@ object Versions {
 
     const val Kotest = "4.2.5"
 
+    const val Shadow = "5.0.0"
+
 }
 
 object Database {
@@ -50,6 +52,8 @@ object Plugins {
     const val KtLint = "org.jlleitschuh.gradle.ktlint"
 
     const val Kotlin = "jvm"
+
+    const val Shadow = "com.github.johnrengelman.shadow"
 
 }
 

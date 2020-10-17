@@ -16,7 +16,7 @@ plugins {
     kotlin(Plugins.Kotlin) version Versions.Kotlin
     id(Plugins.SqlDelight) version Versions.SqlDelight
     id(Plugins.KtLint) version Versions.KtLintGradle
-//    id(Plugins.Shadow) version Versions.Shadow
+    id(Plugins.Shadow) version Versions.Shadow
 }
 
 sqldelight {
@@ -103,7 +103,7 @@ tasks {
         useJUnitPlatform()
     }
     register("stage") {
-        dependsOn("assemble", "clean", "")
+        dependsOn("shadowJar", "clean", "")
         mustRunAfter("clean")
     }
     jar {
