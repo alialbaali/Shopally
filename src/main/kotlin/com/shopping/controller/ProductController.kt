@@ -3,15 +3,17 @@ package com.shopping.controller
 import com.shopping.*
 import com.shopping.domain.dto.product.request.CreateReviewRequest
 import com.shopping.domain.dto.product.request.UpdateReviewRequest
+import com.shopping.domain.dto.product.response.ProductResponse
 import com.shopping.domain.service.ProductService
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
-import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.*
+import kotlin.reflect.KProperty1
+
 
 @KtorExperimentalAPI
 fun Routing.product(productService: ProductService) {
@@ -20,11 +22,7 @@ fun Routing.product(productService: ProductService) {
 
         get {
 
-            val limit = queryParameters["limit"]?.toLongOrNull()
-
-            val offset = queryParameters["offset"]?.toLongOrNull()
-
-            val products = productService.getProducts(limit, offset)
+            val products = productService.getProducts(limit, offset, sortMethod, sortParam)
 
             call.respond(HttpStatusCode.OK, mapOf("products" to products))
         }

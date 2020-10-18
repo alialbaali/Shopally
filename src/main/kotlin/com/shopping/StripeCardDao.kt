@@ -2,6 +2,7 @@ package com.shopping
 
 import com.shopping.domain.StripeCard
 import com.shopping.domain.StripeCardDataSource
+import com.shopping.domain.StripeCustomer
 import com.stripe.model.Charge
 import com.stripe.model.Customer
 import com.stripe.param.ChargeCreateParams

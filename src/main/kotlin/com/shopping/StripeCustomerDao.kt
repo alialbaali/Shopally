@@ -1,13 +1,13 @@
 package com.shopping
 
+import com.shopping.domain.StripeCustomer
 import com.shopping.domain.StripeCustomerDataSource
 import com.stripe.model.Customer
 import com.stripe.param.CustomerCreateParams
 import com.stripe.param.CustomerUpdateParams
 
-typealias StripeCustomer = Customer
-typealias StripeCustomerCreateParams = CustomerCreateParams
-typealias StripeCustomerUpdateParams = CustomerUpdateParams
+private typealias StripeCustomerCreateParams = CustomerCreateParams
+private typealias StripeCustomerUpdateParams = CustomerUpdateParams
 
 class StripeCustomerDao : StripeCustomerDataSource {
 

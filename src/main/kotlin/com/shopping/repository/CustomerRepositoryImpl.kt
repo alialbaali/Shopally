@@ -155,8 +155,8 @@ class CustomerRepositoryImpl(
             .let { Result.success(Cart(it)) }
     }
 
-    override suspend fun getCartItem(customerId: ID, productID: ID): Result<CartItem> {
-        return customerCartQueries.getCartItem(customerId, productID)
+    override suspend fun getCartItem(customerId: ID, productId: ID): Result<CartItem> {
+        return customerCartQueries.getCartItem(customerId, productId)
             .executeAsOneOrNull()
             ?.toCartItem()
             ?.let { Result.success(it) } ?: return Result.failure(Throwable(Errors.CartItemDoesntExist))
