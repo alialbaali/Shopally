@@ -67,6 +67,21 @@ inline val PartData.FileItem.size: String?
 inline val PipelineContext<*, ApplicationCall>.queryParameters: Parameters
     get() = call.request.queryParameters
 
+inline val PipelineContext<*, ApplicationCall>.limit: Long?
+    get() = queryParameters["limit"]?.toLongOrNull()
+
+inline val PipelineContext<*, ApplicationCall>.offset: Long?
+    get() = queryParameters["offset"]?.toLongOrNull()
+
+inline val PipelineContext<*, ApplicationCall>.sort: String
+    get() = queryParameters["sort"].toString()
+
+inline val PipelineContext<*, ApplicationCall>.sortParam: String?
+    get() = sort.substringBefore(':')
+
+inline val PipelineContext<*, ApplicationCall>.sortMethod: String?
+    get() = sort.substringAfter(':')
+
 inline val PipelineContext<*, ApplicationCall>.parameters: Parameters
     get() = call.parameters
 
@@ -78,4 +93,21 @@ fun InputStream.toFile(filePath: String): File = File(filePath).apply {
     outputStream().use { outputStream ->
         copyTo(outputStream)
     }
+}
+
+enum class SortingMethod {
+    Asc, Desc
+}
+
+inline fun <T> Iterable<T>.sortByMethod(method: SortingMethod?, crossinline selector: (T) -> Comparable<*>?): Iterable<T> {
+    return when (method) {
+        SortingMethod.Asc -> sortedWith(compareBy(selector))
+        SortingMethod.Desc -> sortedWith(compareByDescending(selector))
+        else -> this
+    }
+}
+
+fun String?.toSortingMethod(): SortingMethod? {
+    return SortingMethod.values()
+        .find { it.name.equals(this, ignoreCase = true) }
 }
