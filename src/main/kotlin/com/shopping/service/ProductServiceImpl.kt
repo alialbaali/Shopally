@@ -16,24 +16,26 @@ import com.shopping.domain.service.ProductService
 import org.koin.core.KoinComponent
 import org.koin.core.get
 
-private const val PaginationDefaultLimit = 50L
-private const val PaginationDefaultOffset = 0L
+private const val DefaultLimit = 50L
+private const val DefaultOffset = 0L
 
 class ProductServiceImpl(private val productRepository: ProductRepository) : ProductService, KoinComponent {
 
-    override suspend fun getProducts(limit: Long?, offset: Long?): List<ProductResponse> {
+    override suspend fun getProducts(limit: Long?, offset: Long?, method: String?, param: String?): List<ProductResponse> {
 
-        val validLimit = limit?.let {
-            if (it < 100) it else badRequestError(Errors.LimitSize)
-        }
+        val sortingMethod = method.toSortingMethod()
+
+        val sortingParam = param.toProductSortingParam()
+
+        val validLimit = limit?.let { if (it < 100) it else badRequestError(Errors.LimitSize) }
 
         return productRepository.getProducts(
-            validLimit ?: PaginationDefaultLimit,
-            offset ?: PaginationDefaultOffset,
+            validLimit ?: DefaultLimit,
+            offset ?: DefaultOffset,
         ).fold(
             onSuccess = { products -> products.map { createProductResponse(it) } },
             onFailure = { internalServerError(it.message) }
-        )
+        ).sorted(sortingMethod, sortingParam)
     }
 
     override suspend fun getProductById(productId: String): ProductDetailsResponse {
@@ -180,4 +182,25 @@ private fun Review.toReviewResponse(review: Review, customer: Customer, productI
         review.description,
         review.creationDate.toString()
     )
+}
+
+private fun List<ProductResponse>.sorted(method: SortingMethod?, param: ProductSortingParam?): List<ProductResponse> {
+
+    val sortingParam = when (param) {
+        ProductSortingParam.Brand -> ProductResponse::brand
+        ProductSortingParam.Category -> ProductResponse::category
+        ProductSortingParam.Price -> ProductResponse::price
+        else -> return this
+    }
+
+    return sortByMethod(method, sortingParam).toList()
+}
+
+private enum class ProductSortingParam {
+    Price, Brand, Category
+}
+
+private fun String?.toProductSortingParam(): ProductSortingParam? {
+    return ProductSortingParam.values()
+        .find { it.name.equals(this, ignoreCase = true) }
 }
