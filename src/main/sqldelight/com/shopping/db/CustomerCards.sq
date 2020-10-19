@@ -1,9 +1,9 @@
 import com.shopping.domain.model.valueObject.ID;
 
 CREATE TABLE IF NOT EXISTS CustomerCards (
-customer_id TEXT AS ID REFERENCES Customers(id) NOT NULL,
-stripe_card_id TEXT NOT NULL,
-card_last_4_numbers INTEGER NOT NULL,
+customer_id           TEXT   AS ID   NOT NULL   REFERENCES Customers(id),
+stripe_card_id        TEXT           NOT NULL,
+card_last_4_numbers   INTEGER        NOT NULL,
 UNIQUE(customer_id, stripe_card_id, card_last_4_numbers)
 );
 

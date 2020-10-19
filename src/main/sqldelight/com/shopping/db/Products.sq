@@ -3,14 +3,14 @@ import com.shopping.domain.model.valueObject.ID;
 import java.time.LocalDate;
 
 CREATE TABLE IF NOT EXISTS Products (
-id              TEXT    AS ID          NOT NULL    PRIMARY KEY,
-category        TEXT AS Category    NOT NULL,
-brand           TEXT           NOT NULL,
-name            TEXT           NOT NULL,
-description     TEXT           NOT NULL,
-price           REAL    NOT NULL,
-release_date    TEXT    AS LocalDate   NOT NULL,
-creation_date   TEXT    AS LocalDate   NOT NULL
+id              TEXT   AS ID          NOT NULL   PRIMARY KEY,
+category        TEXT   AS Category    NOT NULL,
+brand           TEXT                  NOT NULL,
+name            TEXT                  NOT NULL,
+description     TEXT                  NOT NULL,
+price           REAL                  NOT NULL,
+release_date    TEXT   AS LocalDate   NOT NULL,
+creation_date   TEXT   AS LocalDate   NOT NULL
 );
 
 getProducts:

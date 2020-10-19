@@ -1,9 +1,9 @@
 import com.shopping.domain.model.valueObject.ID;
 
 CREATE TABLE IF NOT EXISTS OrderItems (
-order_id TEXT AS ID REFERENCES Orders(id) NOT NULL,
-product_id TEXT AS ID REFERENCES Products(id) NOT NULL,
-quantity INTEGER NOT NULL,
+order_id     TEXT       AS ID   NOT NULL   REFERENCES Orders(id),
+product_id   TEXT       AS ID   NOT NULL   REFERENCES Products(id),
+quantity     INTEGER            NOT NULL,
 UNIQUE(order_id, product_id)
 );
 

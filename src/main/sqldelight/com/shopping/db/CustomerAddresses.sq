@@ -1,12 +1,12 @@
 import com.shopping.domain.model.valueObject.ID;
 
 CREATE TABLE IF NOT EXISTS CustomerAddresses (
-customer_id TEXT AS ID NOT NULL REFERENCES Customers(id),
-name TEXT NOT NULL,
-country TEXT NOT NULL,
-city TEXT NOT NULL,
-line TEXT NOT NULL,
-zip_code TEXT NOT NULL,
+customer_id   TEXT   AS ID   NOT NULL   REFERENCES Customers(id),
+name          TEXT           NOT NULL,
+country       TEXT           NOT NULL,
+city          TEXT           NOT NULL,
+line          TEXT           NOT NULL,
+zip_code      TEXT           NOT NULL,
 UNIQUE(customer_id, name)
 );
 
