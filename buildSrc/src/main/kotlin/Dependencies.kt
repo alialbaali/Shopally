@@ -13,7 +13,7 @@ object Versions {
 
     const val Kotlin = "1.4.10"
 
-    const val SqlDelight = "1.4.3"
+    const val SqlDelight = "1.4.4"
 
     const val KtLint = "0.39.0"
 

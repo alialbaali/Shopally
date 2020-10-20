@@ -16,6 +16,7 @@ import com.stripe.Stripe
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
+import io.ktor.client.features.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.jackson.*
@@ -35,7 +36,7 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 @kotlin.jvm.JvmOverloads
 fun Application.module(isTesting: Boolean = false) {
 
-    Stripe.apiKey = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
+    Stripe.apiKey = System.getProperty("StripeKey") ?: "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
     install(Locations)
 
@@ -63,6 +64,7 @@ fun Application.module(isTesting: Boolean = false) {
     }
 
     install(ContentNegotiation) {
+        register(APIVersion.V1, JacksonConverter())
         jackson {
             propertyNamingStrategy = PropertyNamingStrategy.SNAKE_CASE
             enable(SerializationFeature.INDENT_OUTPUT)
@@ -93,7 +95,11 @@ fun Application.module(isTesting: Boolean = false) {
     }
 
     routing {
-        get("/") { call.respond(HttpStatusCode.OK, mapOf("status" to "Healthy")) }
+        accept(APIVersion.V1) {
+            get("/") {
+                call.respond(HttpStatusCode.OK, mapOf("status" to "Healthy"))
+            }
+        }
         customer(get<CustomerService>())
         product(get<ProductService>())
         order(get<OrderService>())

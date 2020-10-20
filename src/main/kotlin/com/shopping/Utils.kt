@@ -20,10 +20,11 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 fun String.hash(): String {
-    val secret = System.getenv("SECRET") ?: "4894"
+    val algorithm = "HmacSHA1"
+    val secret = System.getenv("Secret") ?: "4894"
     val hashKey = hex(secret)
-    val hmacKey = SecretKeySpec(hashKey, "HmacSHA1")
-    val hmac = Mac.getInstance("HmacSHA1")
+    val hmacKey = SecretKeySpec(hashKey, algorithm)
+    val hmac = Mac.getInstance(algorithm)
     hmac.init(hmacKey)
     return hex(hmac.doFinal(this.toByteArray(Charsets.UTF_8)))
 }
@@ -93,10 +94,6 @@ fun InputStream.toFile(filePath: String): File = File(filePath).apply {
     outputStream().use { outputStream ->
         copyTo(outputStream)
     }
-}
-
-enum class SortingMethod {
-    Asc, Desc
 }
 
 inline fun <T> Iterable<T>.sortByMethod(method: SortingMethod?, crossinline selector: (T) -> Comparable<*>?): Iterable<T> {
