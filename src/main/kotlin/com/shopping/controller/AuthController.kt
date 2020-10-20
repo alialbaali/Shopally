@@ -1,5 +1,6 @@
 package com.shopping.controller
 
+import com.shopping.APIVersion
 import com.shopping.Errors
 import com.shopping.badRequestError
 import com.shopping.customerId
@@ -15,33 +16,36 @@ import io.ktor.routing.*
 
 fun Routing.auth(authService: AuthService) {
 
-    route("/auth") {
+    accept(APIVersion.V1) {
 
-        post("/new") {
+        route("/auth") {
 
-            val signUpRequest = call.receiveOrNull<SignUpRequest>() ?: badRequestError(Errors.InvalidRequest)
+            post("/new") {
 
-            val tokenResponse = authService.signUp(signUpRequest)
+                val signUpRequest = call.receiveOrNull<SignUpRequest>() ?: badRequestError(Errors.InvalidRequest)
 
-            call.respond(HttpStatusCode.Created, tokenResponse)
-        }
+                val tokenResponse = authService.signUp(signUpRequest)
 
-        post {
+                call.respond(HttpStatusCode.Created, tokenResponse)
+            }
 
-            val signInRequest = call.receiveOrNull<SignInRequest>() ?: badRequestError(Errors.InvalidRequest)
+            post {
 
-            val tokenResponse = authService.signIn(signInRequest)
+                val signInRequest = call.receiveOrNull<SignInRequest>() ?: badRequestError(Errors.InvalidRequest)
 
-            call.respond(HttpStatusCode.OK, tokenResponse)
-        }
-
-        authenticate {
-
-            get {
-
-                val tokenResponse = authService.refreshToken(customerId)
+                val tokenResponse = authService.signIn(signInRequest)
 
                 call.respond(HttpStatusCode.OK, tokenResponse)
+            }
+
+            authenticate {
+
+                get {
+
+                    val tokenResponse = authService.refreshToken(customerId)
+
+                    call.respond(HttpStatusCode.OK, tokenResponse)
+                }
             }
         }
     }

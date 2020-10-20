@@ -8,9 +8,11 @@ import com.shopping.domain.service.ProductService
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
+import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.routing.get
 import io.ktor.util.*
 import kotlin.reflect.KProperty1
 
@@ -18,60 +20,65 @@ import kotlin.reflect.KProperty1
 @KtorExperimentalAPI
 fun Routing.product(productService: ProductService) {
 
-    route("/products") {
+    accept(APIVersion.V1) {
 
-        get {
-
-            val products = productService.getProducts(limit, offset, sortMethod, sortParam)
-
-            call.respond(HttpStatusCode.OK, mapOf("products" to products))
-        }
-
-        route("/{product-id}") {
+        route("/products") {
 
             get {
 
-                val product = productService.getProductById(productId)
+                val searchTerm = queryParameters["search"]
 
-                call.respond(HttpStatusCode.OK, product)
+                val products = productService.getProducts(limit, offset, sortMethod, sortParam, searchTerm)
+
+                call.respond(HttpStatusCode.OK, mapOf("products" to products))
             }
 
-            route("/reviews") {
+            route("/{product-id}") {
 
                 get {
 
-                    val reviews = productService.getReviewsByProductId(productId)
+                    val product = productService.getProductById(productId)
 
-                    call.respond(HttpStatusCode.OK, mapOf("reviews" to reviews))
+                    call.respond(HttpStatusCode.OK, product)
                 }
 
-                authenticate {
+                route("/reviews") {
 
-                    post {
+                    get {
 
-                        val createReviewRequest = call.receiveOrNull<CreateReviewRequest>()
-                            ?: badRequestError(Errors.InvalidRequest)
+                        val reviews = productService.getReviewsByProductId(productId)
 
-                        val reviewResponse = productService.createReview(productId, customerId, createReviewRequest)
-
-                        call.respond(HttpStatusCode.Created, reviewResponse)
+                        call.respond(HttpStatusCode.OK, mapOf("reviews" to reviews))
                     }
 
-                    patch {
+                    authenticate {
 
-                        val updateReviewRequest = call.receiveOrNull<UpdateReviewRequest>()
-                            ?: badRequestError(Errors.InvalidRequest)
+                        post {
 
-                        val reviewResponse = productService.updateReview(productId, customerId, updateReviewRequest)
+                            val createReviewRequest = call.receiveOrNull<CreateReviewRequest>()
+                                ?: badRequestError(Errors.InvalidRequest)
 
-                        call.respond(HttpStatusCode.OK, reviewResponse)
-                    }
+                            val reviewResponse = productService.createReview(productId, customerId, createReviewRequest)
 
-                    delete {
+                            call.respond(HttpStatusCode.Created, reviewResponse)
+                        }
 
-                        val deleteReviewResponse = productService.deleteReview(productId, customerId)
+                        patch {
 
-                        call.respond(HttpStatusCode.NoContent, deleteReviewResponse)
+                            val updateReviewRequest = call.receiveOrNull<UpdateReviewRequest>()
+                                ?: badRequestError(Errors.InvalidRequest)
+
+                            val reviewResponse = productService.updateReview(productId, customerId, updateReviewRequest)
+
+                            call.respond(HttpStatusCode.OK, reviewResponse)
+                        }
+
+                        delete {
+
+                            val deleteReviewResponse = productService.deleteReview(productId, customerId)
+
+                            call.respond(HttpStatusCode.NoContent, deleteReviewResponse)
+                        }
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package com.shopping.controller
 
+import com.shopping.APIVersion
 import com.shopping.Errors
 import com.shopping.badRequestError
 import com.shopping.customerId
@@ -14,36 +15,39 @@ import io.ktor.routing.*
 
 fun Routing.order(orderService: OrderService) {
 
-    authenticate {
+    accept(APIVersion.V1) {
 
-        route("/orders") {
+        authenticate {
 
-            get {
-
-                val ordersResponse = orderService.getOrdersByCustomerId(customerId)
-
-                call.respond(HttpStatusCode.OK, ordersResponse)
-            }
-
-            post {
-
-                val createOrderRequest = call.receiveOrNull<CreateOrderRequest>()
-                    ?: badRequestError(Errors.InvalidRequest)
-
-                val orderDetailsResponse = orderService.createOrder(customerId, createOrderRequest)
-
-                call.respond(HttpStatusCode.Created, orderDetailsResponse)
-            }
-
-            route("/{id}") {
+            route("/orders") {
 
                 get {
 
-                    val orderId = call.parameters["id"] ?: badRequestError(Errors.InvalidRequest)
+                    val ordersResponse = orderService.getOrdersByCustomerId(customerId)
 
-                    val orderDetailsResponse = orderService.getOrderById(customerId, orderId)
+                    call.respond(HttpStatusCode.OK, ordersResponse)
+                }
 
-                    call.respond(HttpStatusCode.OK, orderDetailsResponse)
+                post {
+
+                    val createOrderRequest = call.receiveOrNull<CreateOrderRequest>()
+                        ?: badRequestError(Errors.InvalidRequest)
+
+                    val orderDetailsResponse = orderService.createOrder(customerId, createOrderRequest)
+
+                    call.respond(HttpStatusCode.Created, orderDetailsResponse)
+                }
+
+                route("/{id}") {
+
+                    get {
+
+                        val orderId = call.parameters["id"] ?: badRequestError(Errors.InvalidRequest)
+
+                        val orderDetailsResponse = orderService.getOrderById(customerId, orderId)
+
+                        call.respond(HttpStatusCode.OK, orderDetailsResponse)
+                    }
                 }
             }
         }
