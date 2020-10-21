@@ -7,7 +7,24 @@ import java.io.File
 
 interface ProductRepository {
 
-    suspend fun getProducts(limit: Long, offset: Long): Result<List<Product>>
+    suspend fun searchProducts(
+        limit: Long,
+        offset: Long,
+        categories: Set<Product.Category>,
+        brands: Set<String>,
+        minPrice: Double?,
+        maxPrice: Double?,
+        searchTerm: String?,
+    ): Result<List<Product>>
+
+    suspend fun getProducts(
+        limit: Long,
+        offset: Long,
+        categories: Set<Product.Category>,
+        brands: Set<String>,
+        minPrice: Double?,
+        maxPrice: Double?,
+    ): Result<List<Product>>
 
     suspend fun getProductById(productId: ID): Result<Product>
 

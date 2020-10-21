@@ -75,4 +75,5 @@ object Errors {
     const val ImageUploadFailed = "Image upload failed"
     const val LimitSize = "Maximum limit is 100 and default is 50"
     const val CardDateInTheFuture = "Card date must be in the future"
+    const val PriceMustBeDouble = "Price must be double"
 }

@@ -10,6 +10,7 @@ import com.shopping.domain.dto.product.response.ReviewResponse
 import com.shopping.domain.model.Customer
 import com.shopping.domain.model.Product
 import com.shopping.domain.model.valueObject.Review
+import com.shopping.domain.model.valueObject.SortingMethod
 import com.shopping.domain.repository.CustomerRepository
 import com.shopping.domain.repository.ProductRepository
 import com.shopping.domain.service.ProductService
@@ -21,21 +22,40 @@ private const val DefaultOffset = 0L
 
 class ProductServiceImpl(private val productRepository: ProductRepository) : ProductService, KoinComponent {
 
-    override suspend fun getProducts(limit: Long?, offset: Long?, method: String?, param: String?): List<ProductResponse> {
+    override suspend fun getProducts(
+        limit: Long?,
+        offset: Long?,
+        method: String?,
+        param: String?,
+        categories: List<String>?,
+        brands: List<String>?,
+        minPrice: Double?,
+        maxPrice: Double?,
+        searchTerm: String?,
+    ): List<ProductResponse> {
 
         val sortingMethod = method.toSortingMethod()
-
         val sortingParam = param.toProductSortingParam()
 
-        val validLimit = limit?.let { if (it < 100) it else badRequestError(Errors.LimitSize) }
+        val validLimit = limit?.let { if (it < 100) it else badRequestError(Errors.LimitSize) } ?: DefaultLimit
+        val validOffset = offset ?: DefaultOffset
 
-        return productRepository.getProducts(
-            validLimit ?: DefaultLimit,
-            offset ?: DefaultOffset,
-        ).fold(
-            onSuccess = { products -> products.map { createProductResponse(it) } },
-            onFailure = { internalServerError(it.message) }
-        ).sorted(sortingMethod, sortingParam)
+        val validCategories = categories
+            ?.mapNotNull { category -> Product.Category.values().find { it.name.equals(category, ignoreCase = true) } }
+            ?.toSet() ?: emptySet()
+
+        val validBrands = brands
+            ?.toSet() ?: emptySet()
+
+        val productsResponse =
+            if (searchTerm.isNullOrBlank()) productRepository.getProducts(validLimit, validOffset, validCategories, validBrands, minPrice, maxPrice)
+            else productRepository.searchProducts(validLimit, validOffset, validCategories, validBrands, minPrice, maxPrice, searchTerm)
+
+        return productsResponse
+            .fold(
+                onSuccess = { products -> products.map { createProductResponse(it) } },
+                onFailure = { internalServerError(it.message) })
+            .sorted(sortingMethod, sortingParam)
     }
 
     override suspend fun getProductById(productId: String): ProductDetailsResponse {

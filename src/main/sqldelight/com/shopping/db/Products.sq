@@ -13,9 +13,27 @@ release_date    TEXT   AS LocalDate   NOT NULL,
 creation_date   TEXT   AS LocalDate   NOT NULL
 );
 
+searchProducts:
+SELECT * FROM (
+    SELECT * FROM Products
+    WHERE (category LIKE :searchCategory OR :searchCategory IS NULL) OR
+    (name LIKE :searchName OR :searchName IS NULL) OR
+    (brand LIKE :searchBrand OR :searchBrand IS NULL) OR
+    (description LIKE :searchDescription OR :searchDescription IS NULL)
+)
+WHERE category IN :categories OR
+brand IN :brands OR
+(price == :min_price OR :min_price IS NULL) OR
+(price == :max_price OR :max_price IS NULL)
+LIMIT ? OFFSET ?;
+
 getProducts:
 SELECT * FROM Products
-LIMIT ? OFFSET ?;
+WHERE category IN :categories OR
+brand IN :brands OR
+(price >= :min_price OR :min_price IS NULL) OR
+(price <= :max_price OR :max_price IS NULL)
+LIMIT :limit OFFSET :offset;
 
 getProductById:
 SELECT * FROM Products

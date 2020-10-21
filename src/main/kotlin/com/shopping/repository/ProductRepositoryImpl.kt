@@ -7,6 +7,7 @@ import com.shopping.domain.model.Product
 import com.shopping.domain.model.valueObject.ID
 import com.shopping.domain.model.valueObject.Review
 import com.shopping.domain.repository.ProductRepository
+import com.squareup.sqldelight.db.SqlDriver
 import java.io.File
 import java.time.LocalDate
 
@@ -20,23 +21,44 @@ class ProductRepositoryImpl(
     private val cloudDataSource: CloudDataSource,
 ) : ProductRepository {
 
-    override suspend fun getProducts(limit: Long, offset: Long): Result<List<Product>> {
+    override suspend fun searchProducts(
+        limit: Long,
+        offset: Long,
+        categories: Set<Product.Category>,
+        brands: Set<String>,
+        minPrice: Double?,
+        maxPrice: Double?,
+        searchTerm: String?
+    ): Result<List<Product>> {
 
-        repeat(10) {
-            val product = Product(
-                name = it.toString(),
-                brand = it.toString(),
-                category = Product.Category.values().random(),
-                description = it.toString(),
-                price = it.times(it.toDouble()),
-                imagesUrls = setOf(it.toString()),
-                releaseDate = LocalDate.now().plusYears((2000..3000L).random()),
-            )
+        val products = productsQueries.searchProducts(
+            searchTerm, searchTerm,
+            searchTerm, searchTerm,
+            categories, brands,
+            minPrice, maxPrice,
+            limit, offset
+        ).executeAsList()
+            .map { dbProduct ->
+                val imageUrl = productImagesQueries.getImagesUrlByProductId(dbProduct.id) { _, url -> url }
+                    .executeAsList()
+                    .firstOrNull() ?: ""
 
-            createProduct(product, emptyList()).getOrNull()
-        }
+                dbProduct.toProduct(setOf(imageUrl))
+            }
 
-        val products = productsQueries.getProducts(limit, offset)
+        return Result.success(products)
+    }
+
+    override suspend fun getProducts(
+        limit: Long,
+        offset: Long,
+        categories: Set<Product.Category>,
+        brands: Set<String>,
+        minPrice: Double?,
+        maxPrice: Double?,
+    ): Result<List<Product>> {
+
+        val products = productsQueries.getProducts(categories, brands, minPrice, maxPrice, limit, offset)
             .executeAsList()
             .map { dbProduct ->
                 val imageUrl = productImagesQueries.getImagesUrlByProductId(dbProduct.id) { _, url -> url }

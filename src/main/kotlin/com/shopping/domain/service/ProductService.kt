@@ -9,7 +9,17 @@ import com.shopping.domain.dto.product.response.ReviewResponse
 
 interface ProductService {
 
-    suspend fun getProducts(limit: Long?, offset: Long?, method: String?, param: String?): List<ProductResponse>
+    suspend fun getProducts(
+        limit: Long?,
+        offset: Long?,
+        method: String?,
+        param: String?,
+        categories: List<String>?,
+        brands: List<String>?,
+        minPrice: Double?,
+        maxPrice:Double?,
+        searchTerm: String?,
+    ): List<ProductResponse>
 
     suspend fun getProductById(productId: String): ProductDetailsResponse
 

@@ -26,9 +26,23 @@ fun Routing.product(productService: ProductService) {
 
             get {
 
+                val brands = queryParameters.getAll("brands")
+                val categories = queryParameters.getAll("categories")
+                val minPrice = queryParameters["min_price"]?.let { it.toDoubleOrNull() ?: badRequestError(Errors.PriceMustBeDouble) }
+                val maxPrice = queryParameters["max_price"]?.let { it.toDoubleOrNull() ?: badRequestError(Errors.PriceMustBeDouble) }
                 val searchTerm = queryParameters["search"]
 
-                val products = productService.getProducts(limit, offset, sortMethod, sortParam, searchTerm)
+                val products = productService.getProducts(
+                    limit,
+                    offset,
+                    sortMethod,
+                    sortParam,
+                    categories,
+                    brands,
+                    minPrice,
+                    maxPrice,
+                    searchTerm,
+                )
 
                 call.respond(HttpStatusCode.OK, mapOf("products" to products))
             }
