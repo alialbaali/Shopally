@@ -1,128 +1,197 @@
-package com.shopping
+package com.shopping.fake
 
+import com.shopping.Errors
 import com.shopping.domain.model.Customer
-import com.shopping.domain.model.Order
 import com.shopping.domain.model.valueObject.*
 import com.shopping.domain.repository.CustomerRepository
+import com.shopping.last4Numbers
+import net.bytebuddy.implementation.bytecode.Throw
 import java.io.File
 
 class FakeCustomerRepository(
     private val customers: MutableList<Customer> = mutableListOf(),
-    private val carts: MutableMap<ID, Cart> = mutableMapOf(),
-    private val addresses: MutableMap<ID, Address> = mutableMapOf(),
-    private val cards: MutableMap<ID, Card> = mutableMapOf(),
-    private val cloudDataSource: MutableMap<ID, File> = mutableMapOf(),
 ) : CustomerRepository {
 
     override suspend fun getCustomerById(customerId: ID): Result<Customer> {
-        val customer = customers.find { customer -> customer.id == customerId }
-            ?: return Result.failure(Throwable(Errors.INVALID_ID))
-
-        return Result.success(customer)
+        return customers.find { customer -> customer.id == customerId }
+            ?.let { Result.success(it) } ?: Result.failure(Throwable(Errors.CustomerDoesntExist))
     }
 
     override suspend fun getCustomerByEmail(customerEmail: Email): Result<Customer> {
-        val customer = customers.find { customer -> customer.email == customerEmail }
-            ?: return Result.failure(Throwable(Errors.INVALID_EMAIL))
-
-        return Result.success(customer)
+        return customers.find { customer -> customer.email == customerEmail }
+            ?.let { Result.success(it) } ?: return Result.failure(Throwable(Errors.CustomerDoesntExist))
     }
 
     override suspend fun createCustomer(customer: Customer): Result<Customer> {
-        return if (customers.any { it.email.toString().toLowerCase() == customer.email.toString().toLowerCase() }){
-            Result.failure(Throwable(Errors.INVALID_EMAIL))
-        }
-        else {
-            customers.add(customer)
-            Result.success(customer)
-        }
+        return customers.add(customer)
+            .let { Result.success(customer) }
     }
 
     override suspend fun updateCustomer(customer: Customer): Result<Customer> {
-
-        val customerIndex = customers.indexOfFirst { it.id == customer.id }
-
-        return if (customerIndex == -1)
-            Result.failure(Throwable(Errors.INVALID_ID))
-        else {
-            customers[customerIndex] = customer
-            Result.success(customer)
-        }
+        return getCustomerIndexById(customer.id)
+            .map { customerIndex ->
+                val currentCustomer = customers[customerIndex]
+                customers[customerIndex] = currentCustomer.copy(
+                    name = customer.name,
+                    email = customer.email,
+                    password = customer.password,
+                )
+                customer
+            }
     }
 
-    override suspend fun updateCustomerImage(customerId: ID, imageFile: File): Result<String> {
-
-        val customer = getCustomerById(customerId).getOrElse {
-            return Result.failure(it)
-        }
-
-        cloudDataSource[customer.id] = imageFile
-
-        return Result.success(imageFile.absolutePath)
+    override suspend fun updateCustomerImage(customerId: ID, customerImageFile: File): Result<String> {
+        return getCustomerIndexById(customerId)
+            .map { customerIndex ->
+                val customer = customers[customerIndex]
+                val imageUrl = customerImageFile.absolutePath
+                customers[customerIndex] = customer.copy(imageUrl = imageUrl)
+                imageUrl
+            }
     }
 
-    override suspend fun deleteCustomerById(customerId: ID): Result<ID> =
-        if (customers.removeIf { customer -> customer.id == customerId })
-            Result.success(customerId)
-        else
-            Result.failure(Throwable(Errors.INVALID_ID))
+    override suspend fun deleteCustomerById(customerId: ID): Result<ID> {
+        val isRemoved = customers.removeIf { customer -> customer.id == customerId }
+        return if (isRemoved) Result.success(customerId) else Result.failure(Throwable(Errors.CustomerDoesntExist))
+    }
 
     override suspend fun getCartByCustomerId(customerId: ID): Result<Cart> {
-        val entry = carts.entries.find { entry -> entry.key == customerId } ?: return Result.failure(Throwable())
-        return Result.success(entry.value)
+        return getCustomerById(customerId)
+            .map { customer -> customer.cart }
     }
 
-    override suspend fun createCartItem(customerId: ID, orderItem: Order.OrderItem): Result<Order.OrderItem> {
-        carts[customerId] = Cart(carts[customerId]?.value?.plus(orderItem) ?: return Result.failure(Throwable()))
-        return Result.success(orderItem)
+    override suspend fun getCartItem(customerId: ID, productId: ID): Result<CartItem> {
+        return getCustomerById(customerId)
+            .map { customer ->
+                customer.cart.value
+                    .find { cartItem -> cartItem.productId == productId }
+                    ?: return Result.failure(Throwable(Errors.CartItemDoesntExist))
+            }
     }
 
-    override suspend fun updateCartItem(customerId: ID, orderItem: Order.OrderItem): Result<Order.OrderItem> {
-
-        TODO("Not yet implemented")
+    override suspend fun createCartItem(customerId: ID, cartItem: CartItem): Result<CartItem> {
+        return getCustomerIndexById(customerId)
+            .map { customerIndex ->
+                val customer = customers[customerIndex]
+                val cartItems = customer.cart.value.toMutableSet()
+                cartItems.add(cartItem)
+                customers[customerIndex] = customer.copy(cart = Cart(cartItems))
+                cartItem
+            }
     }
 
-    override suspend fun deleteCartItem(customerId: ID, productID: ID): Result<Unit> {
-        TODO("Not yet implemented")
+    override suspend fun updateCartItem(customerId: ID, cartItem: CartItem): Result<CartItem> {
+        return getCustomerIndexById(customerId)
+            .map { customerIndex ->
+                val customer = customers[customerIndex]
+                val cartItems = customer.cart.value.toMutableList()
+                val cartItemIndex = cartItems.indexOfFirst { it.productId == cartItem.productId }
+                cartItems[cartItemIndex] = cartItem
+                customers[customerIndex] = customer.copy(cart = Cart(cartItems.toSet()))
+                cartItem
+            }
     }
 
-    override suspend fun emptyCartByCustomerId(customerId: ID): Result<Unit> {
-        TODO("Not yet implemented")
+    override suspend fun deleteCartItem(customerId: ID, productId: ID): Result<ID> {
+        return getCustomerIndexById(customerId)
+            .map { customerIndex ->
+                val customer = customers[customerIndex]
+                val cartItems = customer.cart.value.toMutableList()
+                cartItems.removeIf { it.productId == productId }
+                productId
+            }
     }
 
-    override suspend fun getAddressByName(customerId: ID, addressName: String): Result<Address> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun countAddressesByCustomerId(customerId: ID): Result<Long> {
-        val addressesCount = addresses.count { entry -> entry.key == customerId }
-        return Result.success(addressesCount.toLong())
-    }
-
-    override suspend fun getCardByNumber(customerId: ID, cardNumber: Long): Result<Card> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun countCardsByCustomerId(customerId: ID): Result<Long> {
-        val cardsCount = cards.count { entry -> entry.key == customerId }
-        return Result.success(cardsCount.toLong())
+    override suspend fun deleteCartItemsByCustomerId(customerId: ID): Result<ID> {
+        return getCustomerIndexById(customerId)
+            .map { customerIndex ->
+                val customer = customers[customerIndex]
+                customers[customerIndex] = customer.copy(cart = Cart.Empty)
+                customerId
+            }
     }
 
     override suspend fun getAddressesByCustomerId(customerId: ID): Result<Set<Address>> {
-        return Result.success(addresses.filterKeys { it == customerId }.values.toSet())
+        return getCustomerById(customerId)
+            .map { customer -> customer.addresses }
+    }
+
+    override suspend fun getAddress(customerId: ID, addressName: String): Result<Address> {
+        return getCustomerById(customerId)
+            .map {
+                it.addresses
+                    .find { address -> address.name == addressName } ?: return Result.failure(Throwable(Errors.AddressDoesntExist))
+            }
+    }
+
+    override suspend fun createAddress(customerId: ID, address: Address): Result<Address> {
+        return getCustomerIndexById(customerId)
+            .map { customerIndex ->
+                val customer = customers[customerIndex]
+                customers[customerIndex] = customer.copy(addresses = customer.addresses.plus(address))
+                address
+            }
+    }
+
+    override suspend fun deleteAddress(customerId: ID, addressName: String): Result<String> {
+        return getCustomerIndexById(customerId)
+            .map { customerIndex ->
+                val customer = customers[customerIndex]
+                val address = customer.addresses.first { it.name == addressName }
+                customers[customerIndex] = customer.copy(addresses = customer.addresses.minus(address))
+                addressName
+            }
+    }
+
+    override suspend fun countAddressesByCustomerId(customerId: ID): Result<Long> {
+        return getCustomerById(customerId)
+            .map { customer -> customer.addresses.count().toLong() }
     }
 
     override suspend fun getCardsByCustomerId(customerId: ID): Result<Set<Card>> {
-        return Result.success(cards.filterKeys { it == customerId }.values.toSet())
+        return getCustomerById(customerId)
+            .map { customer -> customer.cards }
     }
 
-    override suspend fun createAddressByCustomerId(customerId: ID, address: Address): Result<Address> {
-        addresses[customerId] = address
-        return Result.success(address)
+    override suspend fun getCard(customerId: ID, cardLast4Numbers: Long): Result<Card> {
+        return getCustomerById(customerId)
+            .map { customer ->
+                customer.cards
+                    .find { card -> card.last4Numbers == cardLast4Numbers }
+                    ?: return Result.failure(Throwable(Errors.CardDoesntExist))
+            }
     }
 
-    override suspend fun createCardByCustomerId(customerId: ID, card: Card): Result<Card> {
-        cards[customerId] = card
-        return Result.success(card)
+    override suspend fun createCard(customerId: ID, card: Card): Result<Card> {
+        return getCustomerIndexById(customerId)
+            .map { customerIndex ->
+                val customer = customers[customerIndex]
+                customers[customerIndex] = customer.copy(cards = customer.cards.plus(card))
+                card
+            }
     }
+
+    override suspend fun deleteCard(customerId: ID, cardLast4Numbers: Long): Result<Long> {
+        return getCustomerIndexById(customerId)
+            .map { customerIndex ->
+                val customer = customers[customerIndex]
+                val card = customer.cards.first { card -> card.last4Numbers == cardLast4Numbers }
+                customers[customerIndex] = customer.copy(cards = customer.cards.minus(card))
+                cardLast4Numbers
+            }
+    }
+
+    override suspend fun countCardsByCustomerId(customerId: ID): Result<Long> {
+        return getCustomerById(customerId)
+            .map { customer -> customer.cards.count().toLong() }
+    }
+
+    override suspend fun chargeCard(customerId: ID, cardLast4Numbers: Long, amount: Double): Result<Unit> = runCatching {}
+
+    private fun getCustomerIndexById(customerId: ID): Result<Int> {
+        return customers.indexOfFirst { customer -> customer.id == customerId }
+            .takeUnless { it == -1 }
+            ?.let { Result.success(it) } ?: Result.failure(Throwable(Errors.CustomerDoesntExist))
+    }
+
 }
