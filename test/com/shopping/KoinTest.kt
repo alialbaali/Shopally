@@ -9,6 +9,8 @@ import com.shopping.domain.repository.OrderRepository
 import com.shopping.domain.repository.ProductRepository
 import com.shopping.domain.service.AuthService
 import com.shopping.domain.service.CustomerService
+import com.shopping.domain.service.OrderService
+import com.shopping.domain.service.ProductService
 import com.shopping.fake.FakeCustomerRepository
 import com.shopping.fake.FakeOrderRepository
 import com.shopping.fake.FakeProductRepository
@@ -17,16 +19,21 @@ import com.shopping.repository.OrderRepositoryImpl
 import com.shopping.repository.ProductRepositoryImpl
 import com.shopping.service.CustomerServiceImpl
 import com.shopping.service.JWTAuthService
+import com.shopping.service.OrderServiceImpl
+import com.shopping.service.ProductServiceImpl
 import io.mockk.mockk
 import org.koin.dsl.module
 
-val testDBModule = module {
+val testServiceModule = module(override = true) {
 
-//    single<JdbcSqliteDriver>(override = true) {
-//        JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY).apply {
-//            ShoppingDatabase.Schema.create(this)
-//        }
-//    }
+    single<AuthService> { JWTAuthService(get<CustomerRepository>()) }
+
+    single<CustomerService> { CustomerServiceImpl(get<CustomerRepository>()) }
+
+    single<OrderService> { OrderServiceImpl(get<OrderRepository>()) }
+
+    single<ProductService> { ProductServiceImpl(get<ProductRepository>()) }
+
 }
 
 val fakeRepositoryModule = module(override = true) {
@@ -36,13 +43,6 @@ val fakeRepositoryModule = module(override = true) {
     single<OrderRepository> { FakeOrderRepository() }
 
     single<ProductRepository> { FakeProductRepository() }
-}
-
-val testServiceModule = module(override = true) {
-
-    single<AuthService> { JWTAuthService(get<CustomerRepository>()) }
-
-    single<CustomerService> { CustomerServiceImpl(get<CustomerRepository>()) }
 }
 
 val testRepositoryModule = module(override = true) {
