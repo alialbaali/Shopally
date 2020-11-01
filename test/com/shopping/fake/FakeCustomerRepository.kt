@@ -5,7 +5,6 @@ import com.shopping.domain.model.Customer
 import com.shopping.domain.model.valueObject.*
 import com.shopping.domain.repository.CustomerRepository
 import com.shopping.last4Numbers
-import net.bytebuddy.implementation.bytecode.Throw
 import java.io.File
 
 class FakeCustomerRepository(
@@ -24,7 +23,12 @@ class FakeCustomerRepository(
 
     override suspend fun createCustomer(customer: Customer): Result<Customer> {
         return customers.add(customer)
-            .let { Result.success(customer) }
+            .let {
+                if (it)
+                    Result.success(customer)
+                else
+                    Result.failure(Throwable(Errors.UsedEmail))
+            }
     }
 
     override suspend fun updateCustomer(customer: Customer): Result<Customer> {

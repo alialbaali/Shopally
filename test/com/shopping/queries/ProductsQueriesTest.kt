@@ -8,6 +8,7 @@ import com.shopping.domain.model.Product
 import com.shopping.domain.model.valueObject.ID
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrowAny
+import io.kotest.matchers.collections.shouldHaveAtLeastSize
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -27,9 +28,6 @@ class ProductsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                 When("getting products in the db") {
                     Then("it should return products based on limit and offset") {
 
-                        val limit = 100L
-                        val offset = 50L
-
                         shouldNotThrowAny {
 
                             repeat(500) {
@@ -47,8 +45,8 @@ class ProductsQueriesTest : DefaultSpec(dbModule, dataSourceModule) {
                             }
                         }
 
-                        productsQueries.getProducts(limit, offset)
-                            .executeAsList() shouldHaveSize 100
+                        productsQueries.getProducts(emptyList(), emptyList(), null, null, 500, 0)
+                            .executeAsList() shouldHaveAtLeastSize 100
                     }
                 }
             }

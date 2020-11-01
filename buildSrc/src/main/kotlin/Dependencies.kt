@@ -29,9 +29,9 @@ object Versions {
 
     const val Koin = "2.1.6"
 
-    const val Mockk = "1.10.0"
+    const val Mockk = "1.10.2"
 
-    const val Kotest = "4.2.5"
+    const val Kotest = "4.3.0"
 
     const val Shadow = "5.0.0"
 
