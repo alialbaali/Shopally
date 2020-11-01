@@ -3,11 +3,10 @@ package com.shopping.service
 import com.shopping.*
 import com.shopping.domain.dto.customer.request.SignInRequest
 import com.shopping.domain.dto.customer.request.SignUpRequest
-import com.shopping.domain.model.valueObject.ID
 import com.shopping.domain.service.AuthService
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowAny
-import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.string.shouldNotBeEmpty
 import org.koin.test.inject
@@ -22,13 +21,7 @@ class JWTAuthServiceTest : DefaultSpec(testServiceModule, helperModule, fakeRepo
             When("calling auth service sign up method") {
                 Then("it should return a token response with a valid access and refresh token") {
 
-                    val signUpRequest = SignUpRequest(
-                        "John",
-                        "johndoe@mail.com",
-                        "password0"
-                    )
-
-                    val tokenResponse = authService.signUp(signUpRequest)
+                    val tokenResponse = authService.signUpTestCustomer()
 
                     tokenResponse.shouldNotBeNull()
                     tokenResponse.accessToken.shouldNotBeEmpty()
@@ -41,15 +34,10 @@ class JWTAuthServiceTest : DefaultSpec(testServiceModule, helperModule, fakeRepo
             When("calling auth service sign up method") {
                 Then("it should throw an API Error exception") {
 
-                    val signUpRequest = SignUpRequest(
-                        "John",
-                        "johndoe@com",
-                        "pass"
-                    )
-
                     shouldThrow<APIError> {
-                        authService.signUp(signUpRequest)
+                        authService.signUpTestCustomer(name = "John", email = "johndoe@com", password = "pass")
                     }
+
                 }
             }
         }
@@ -58,13 +46,7 @@ class JWTAuthServiceTest : DefaultSpec(testServiceModule, helperModule, fakeRepo
             When("calling auth service sign in method") {
                 Then("it should return a token response with a valid access and refresh token") {
 
-                    val signUpRequest = SignUpRequest(
-                        "John",
-                        "johndoe3@mail.com",
-                        "password0"
-                    )
-
-                    authService.signUp(signUpRequest)
+                    shouldNotThrowAny { authService.signUpTestCustomer(email = "johndoe3@mail.com") }
 
                     val signInRequest = SignInRequest(
                         "johndoe3@mail.com",
@@ -100,16 +82,10 @@ class JWTAuthServiceTest : DefaultSpec(testServiceModule, helperModule, fakeRepo
             When("calling auth service sign up method on each of them") {
                 Then("it should throw an Authentication Error exception") {
 
-                    val signUpRequest = SignUpRequest(
-                        "John",
-                        "johndoe@mail1.com",
-                        "password0"
-                    )
-
-                    authService.signUp(signUpRequest)
+                    authService.signUpTestCustomer(email = "Johndoe4@mail.com")
 
                     shouldThrowAny {
-                        authService.signUp(signUpRequest)
+                        authService.signUpTestCustomer(email = "Johndoe4@mail.com")
                     }
                 }
             }
@@ -135,9 +111,9 @@ class JWTAuthServiceTest : DefaultSpec(testServiceModule, helperModule, fakeRepo
             When("calling auth service refresh token method") {
                 Then("it should return a Token Response with access and refresh tokens") {
 
-                    val id = ID.random().toString()
+                    val response = authService.signUpTestCustomer(email = "Johndoe5@mail.com")
 
-                    val tokenResponse = authService.refreshToken(id)
+                    val tokenResponse = authService.refreshToken(response.customerId)
 
                     tokenResponse.shouldNotBeNull()
                     tokenResponse.accessToken.shouldNotBeEmpty()

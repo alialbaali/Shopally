@@ -228,7 +228,7 @@ private fun Customer.toCustomerResponse(addressCount: Long, cardsCount: Long): C
 private fun Card.toCardResponse(): CardResponse {
     val expMonth = expirationDate.monthValue
     val expYear = expirationDate.year
-    return CardResponse(brand, number.toString(), expMonth, expYear)
+    return CardResponse(brand, last4Numbers.toString(), expMonth, expYear)
 }
 
 private fun CartItem.toCartItemResponse(product: Product): CartItemResponse {
